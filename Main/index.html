@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CASSANDRA/JAMMAILA-SKIN | Luxury Botanical Skincare</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <nav class="nav" role="navigation" aria-label="Primary">
+        <div class="container nav__inner">
+            <a class="nav__logo" href="#top" aria-label="JAMMAILA-SKIN/CASSANDRA home">JAMMAILA-SKIN/<span>CASSANDRA</span></a>
+
+            <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+                <span class="nav__toggleBars" aria-hidden="true"></span>
+            </button>
+
+            <div class="nav__center" id="navMenu" data-collapsible>
+                <a class="nav__link" href="#shop">Shop</a>
+                <a class="nav__link" href="#benefits">About</a>
+                <a class="nav__link" href="#footer">Contact</a>
+</div>
+
+            <button class="nav__cart" type="button" aria-label="Shopping bag" data-cart-open>
+                <span class="nav__cartIcon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 9V7a5 5 0 0 1 10 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M6.5 9h11l1 12.5a1.2 1.2 0 0 1-1.2 1.3H6.7a1.2 1.2 0 0 1-1.2-1.3L6.5 9Z" stroke="currentColor" stroke-width="1.6" />
+                    </svg>
+                </span>
+                <span class="nav__badge" aria-label="Items in bag" data-cart-badge>0</span>
+            </button>
+        </div>
+    </nav>
+
+    <main id="top">
+        <header class="heroBanner" aria-label="Hero">
+            <div class="heroBanner__bg" aria-hidden="true">
+                <img class="heroBanner__slide is-active" src="assets/images/hero1.jpg.png" alt="" loading="eager" decoding="async" />
+                <img class="heroBanner__slide" src="assets/images/hero2.jpg.png" alt="" loading="lazy" decoding="async" />
+                <img class="heroBanner__slide" src="assets/images/hero3.jpg.png" alt="" loading="lazy" decoding="async" />
+            </div>
+            <div class="container heroBanner__inner">
+                <div class="heroBanner__content">
+                    <h1 class="heroBanner__title">Reveal Your<br />Natural Glow</h1>
+                    <p class="heroBanner__sub">Organic, cruelty-free skincare formulated to bring out the best in your skin, every single day.</p>
+                    <a class="btn btn--cta" href="#shop">Shop Collection</a>
+                </div>
+            </div>
+        </header>
+
+        <section class="proof" aria-label="Botanical ribbon">
+            <div class="container proof__inner">
+                <div class="proofRibbon" aria-hidden="true">
+                    <span class="proofRibbon__flourish proofRibbon__flourish--left">
+                        <svg viewBox="0 0 260 34" xmlns="http://www.w3.org/2000/svg" fill="none">
+                            <path d="M5 17c18 0 22-10 44-10s26 20 48 20 26-20 48-20 26 20 48 20 26-10 59-10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.9" />
+                            <path d="M58 12c-6-5-14-7-20-7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.8" />
+                            <path d="M60 22c-6 5-14 7-20 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.8" />
+                            <path d="M146 10c-4-4-9-6-15-6" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.75" />
+                            <path d="M146 24c-4 4-9 6-15 6" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.75" />
+                            <path d="M222 13c6-4 14-6 21-6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.8" />
+                            <path d="M222 21c6 4 14 6 21 6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.8" />
+                        </svg>
+                    </span>
+
+                    <div class="proofRibbon__pill">JAMMAILA SKIN &nbsp;•&nbsp; EST. 2026</div>
+
+                    <span class="proofRibbon__flourish proofRibbon__flourish--right">
+                        <svg viewBox="0 0 260 34" xmlns="http://www.w3.org/2000/svg" fill="none">
+                            <path d="M255 17c-18 0-22-10-44-10s-26 20-48 20-26-20-48-20-26 20-48 20-26-10-59-10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.9" />
+                            <path d="M202 12c6-5 14-7 20-7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.8" />
+                            <path d="M200 22c6 5 14 7 20 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.8" />
+                            <path d="M114 10c4-4 9-6 15-6" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.75" />
+                            <path d="M114 24c4 4 9 6 15 6" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.75" />
+                            <path d="M38 13c-6-4-14-6-21-6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.8" />
+                            <path d="M38 21c-6 4-14 6-21 6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.8" />
+                        </svg>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="benefits" aria-label="Core benefits">
+            <div class="container">
+                <div class="section__head">
+                    <h2 class="section__title">About Us</h2>
+                    <p class="section__desc">Welcome to our official Jammaila Skin distributor website!</p>
+                </div>
+
+                <div class="benefits">
+                    <article class="card benefit">
+                        <div class="benefit__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 21s7-4.4 7-11a7 7 0 0 0-14 0c0 6.6 7 11 7 11Z" stroke="currentColor" stroke-width="1.6" />
+                                <path d="M9.5 10.5c.8-1.3 1.9-2 2.9-2 1 0 1.9.7 2.6 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="benefit__kicker">Authorized Distributor</div>
+                        <h3 class="card__title">Rhodora Logronio</h3>
+                        <p class="card__text">This website is proudly managed by Rhodora Logronio, an authorized distributor of Jammaila Skin, committed to bringing authentic skincare products.</p>
+                    </article>
+
+                    <article class="card benefit">
+                        <div class="benefit__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2c4 4.5 6 7.4 6 10.5A6 6 0 0 1 6 12.5C6 9.4 8 6.5 12 2Z" stroke="currentColor" stroke-width="1.6" />
+                                <path d="M9 14.5c.7 1.1 1.8 1.8 3 1.8s2.3-.7 3-1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="benefit__kicker">Meet the Product Owner</div>
+                        <h3 class="card__title">Jammaila Kimkim Budac</h3>
+                        <p class="card__text">CEO &amp; Owner of Jammaila SKN, a growing skincare brand dedicated to helping people achieve healthy, glowing, and confident skin.</p>
+                    </article>
+
+                    <article class="card benefit">
+                        <div class="benefit__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2 4 5.5V11c0 5.3 3.1 9.9 8 11 4.9-1.1 8-5.7 8-11V5.5L12 2Z" stroke="currentColor" stroke-width="1.6" />
+                                <path d="m8.5 12 2.3 2.3L15.8 9.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="benefit__kicker">Our Mission</div>
+                        <h3 class="card__title">Our Core Purpose</h3>
+                        <p class="card__text">To provide genuine Jammaila Skin products while helping customers and aspiring resellers experience confidence, beauty, and business opportunities.</p>
+                    </article>
+                </div>
+
+                <div class="benefitsMeta" aria-label="Why Choose Us">
+                    <div class="benefitsMeta__features">✓ Authentic Products&nbsp;&nbsp;|&nbsp;&nbsp;✓ Trusted Service&nbsp;&nbsp;|&nbsp;&nbsp;✓ Customer Support&nbsp;&nbsp;|&nbsp;&nbsp;✓ Reseller Opportunities</div>
+                    <div class="benefitsMeta__closing">Thank you for trusting us and becoming part of the Jammaila Skin family! ✨</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="shop" aria-label="Shop products">
+            <div class="container">
+                <div class="section__head">
+                    <h2 class="section__title">Shop Best Sellers</h2>
+                    <p class="section__desc">Curated essentials designed for a clean, luminous finish.</p>
+                </div>
+
+                <section class="shop-section" data-product-rail-layer="1" data-products-key="storeProducts">
+                    <div class="shopTabs">
+                        <div class="shopTabs__track">
+                            <button class="shopTabs__btn is-active" type="button" data-target="all">ALL PRODUCTS</button>
+                            <button class="shopTabs__btn" type="button" data-target="individual">INDIVIDUAL PRODUCT</button>
+                            <button class="shopTabs__btn" type="button" data-target="set">SET PRODUCT</button>
+                            <button class="shopTabs__btn" type="button" data-target="package">PACKAGE PRODUCT</button>
+                            <div class="shopTabs__indicator" aria-hidden="true"></div>
+                        </div>
+                    </div>
+
+                    <div class="productRail__wrapper" style="position: relative;">
+                        <button class="rail-arrow rail-arrow--left" type="button" data-direction="left" aria-label="Scroll products left">‹</button>
+                        <button class="rail-arrow rail-arrow--right" type="button" data-direction="right" aria-label="Scroll products right">›</button>
+
+                        <div class="productRail__viewport" id="viewport-layer-1">
+                            <div class="productRail__track" id="primary-product-rail"></div>
+                        </div>
+                    </div>
+                    <div class="carousel-dots" id="dots-layer-1"></div>
+                </section>
+
+                <section class="shop-section" data-product-rail-layer="2" data-products-key="storeProductsLayer2">
+                    <div class="productRail__wrapper" style="position: relative;">
+                        <button class="rail-arrow rail-arrow--left" type="button" data-direction="left" aria-label="Scroll products left">‹</button>
+                        <button class="rail-arrow rail-arrow--right" type="button" data-direction="right" aria-label="Scroll products right">›</button>
+
+                        <div class="productRail__viewport" id="viewport-layer-2">
+                            <div class="productRail__track" id="secondary-product-rail"></div>
+                        </div>
+                    </div>
+                    <div class="carousel-dots" id="dots-layer-2"></div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" id="footer">
+        <div class="container footer__inner">
+            <div class="footer__brand">Jammaila Skin</div>
+            <div class="footer__links">
+                <a href="#shop">Collection</a>
+                <a href="#" data-cart-open>Cart</a>
+            </div>
+            <div class="footer__contact" aria-label="Contact channels">
+                <a href="https://www.facebook.com/charlize.therone.568" target="_blank" rel="noopener">Facebook</a>
+                <a href="tel:+639123456789">+63 912 345 6789</a>
+                <a href="mailto:rhodoralogronio732@gmail.com">rhodoralogronio732@gmail.com</a>
+            </div>
+
+            <div class="footer__fine">  Jammaila Skin. All rights reserved.<br />
+                <a href="admin.html" class="footer-admin-link">RhodoraL</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="product-modal" class="product-modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-body-grid">
+                <div class="modal-left-col">
+                    <div class="modal-image-wrapper">
+                        <img id="modal-product-img" src="" alt="Product Detail">
+                    </div>
+                </div>
+                <div class="modal-right-col">
+                    <span class="modal-brand-tag">Jammaila Skin</span>
+                    <h2 id="modal-product-title" class="modal-product-title">Product Title</h2>
+                    <div id="modal-product-price" class="modal-product-price">₱ 0.00</div>
+                                        <div class="product-detail-section">
+                        <h4>PRODUCT DESCRIPTION</h4>
+                        <p id="modal-product-desc">No description available.</p>
+                    </div>
+
+                    <div class="product-detail-section">
+                        <h4>USAGE INSTRUCTIONS</h4>
+                        <p id="modal-product-usage">No usage instructions available.</p>
+                    </div>
+                    <div id="modal-product-includes-section" class="product-detail-section" hidden>
+                        <h4 id="modal-product-includes-heading">PACKAGE INCLUDES</h4>
+                        <p id="modal-product-includes">No package information available.</p>
+                    </div>
+                    <div class="modal-purchase-actions">
+                        <div class="quantity-selector">
+                            <button type="button" class="qty-btn qty-minus">−</button>
+                            <input type="number" class="qty-input" value="1" min="1" readonly>
+                            <button type="button" class="qty-btn qty-plus">+</button>
+                        </div>
+                        <button class="modal-submit-btn">ADD TO BAG</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-sidebar-overlay" class="cart-overlay">
+        <div class="cart-drawer">
+            <div class="cart-header">
+                <h2>CART (<span id="cart-count-display">0</span> items)</h2>
+                <button class="cart-close-btn">&times;</button>
+            </div>
+            <div id="cart-items-container" class="cart-items-list">
+            </div>
+            <div class="cart-footer">
+                <div class="cart-subtotal-row">
+                    <span>Total:</span>
+                    <span id="cart-total-price">₱ 0.00</span>
+                </div>
+                <div class="cart-terms-container">
+                    <label class="cart-terms-label">
+                        <input type="checkbox" id="cart-terms-checkbox">
+                        <span>By checking out, you agree to Jammaila Skin's <a href="#" class="terms-link">Terms &amp; Conditions</a>.</span>
+                    </label>
+                </div>
+                <button class="cart-checkout-btn">CHECKOUT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="terms-modal" class="product-modal-overlay" style="z-index: 3000;">
+        <div class="modal-card" style="max-width: 600px;">
+            <button class="terms-close-btn" style="position: absolute; top: 20px; right: 25px; background: none; border: none; font-size: 2rem; color: #a39074; cursor: pointer;">&times;</button>
+            <div style="padding: 40px 35px; max-height: 80vh; overflow-y: auto; font-family: 'Inter', sans-serif;">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #1a1a1a; margin-bottom: 20px; text-align: center;">Terms &amp; Conditions</h2>
+
+                <div style="font-size: 0.9rem; line-height: 1.6; color: #4a4a4a; display: flex; flex-direction: column; gap: 15px;">
+                    <p>Welcome to our official Jammaila Skin distributor platform. By checking out, you explicitly acknowledge and agree to the following product safety and storefront policies:</p>
+
+                    <div>
+                        <strong style="color: #1a1a1a; display: block; margin-bottom: 4px;">1. Skincare Safety &amp; Patch Testing</strong>
+                        All Jammaila Skin products are formulated with premium quality ingredients. However, because everyone's skin type reacts differently, we highly recommend performing a 24-hour patch test on a small area of your skin before full application. Discontinue use immediately if irritation, redness, or discomfort occurs.
+                    </div>
+
+                    <div>
+                        <strong style="color: #1a1a1a; display: block; margin-bottom: 4px;">2. Authenticity Guarantee</strong>
+                        This website is proudly operated by a verified, authorized distributor of Jammaila Skin. We guarantee that 100% of the products shipped out through this digital system are genuine, factory-sealed, and sourced directly from the main brand headquarters.
+                    </div>
+
+                    <div>
+                        <strong style="color: #1a1a1a; display: block; margin-bottom: 4px;">3. Returns &amp; Cosmetics Hygiene Policy</strong>
+                        Due to the strict health and sanitary nature of cosmetic items, we operate under a strict No Return / No Exchange policy once a product has been unsealed or used. If you receive an incorrect order or a package damaged during transit, please take an unboxing video and reach out to us within 48 hours for a replacement.
+                    </div>
+
+                    <div>
+                        <strong style="color: #1a1a1a; display: block; margin-bottom: 4px;">4. Shipping &amp; Logistics</strong>
+                        Once your package is handed over to our standard local delivery couriers, shipping timelines are subject to their networks. We are not liable for standard third-party carrier delays, but we will fully assist you in tracking your delivery to ensure it arrives safely.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./landing.js?v=6"></script>
+</body>
+
+</html>

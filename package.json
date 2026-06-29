@@ -1,0 +1,20 @@
+{
+  "name": "beauty-product-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "tailwind:build": "tailwindcss -i ./Main/tailwind.input.css -o ./Main/tailwind.css --minify",
+    "tailwind:watch": "tailwindcss -i ./Main/tailwind.input.css -o ./Main/tailwind.css --watch",
+    "serve": "http-server ./Main -p 8080 -c-1",
+    "dev": "concurrently -k -n TAILWIND,SERVER -c magenta,cyan \"npm:tailwind:watch\" \"npm:serve\"",
+    "start": "npm run serve"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "http-server": "^14.1.1",
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8.4.47",
+    "autoprefixer": "^10.4.20"
+  }
+}

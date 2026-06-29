@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout | CASSANDRA/JAMMAILA-SKIN</title>
+    <link rel="icon" href="data:,">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="checkout.css" />
+</head>
+
+<body>
+    <nav class="nav" role="navigation" aria-label="Primary">
+        <div class="container nav__inner">
+            <a class="nav__logo" href="index.html#top" aria-label="CASSANDRA/JAMMAILA-SKIN home">CASSANDRA/<span>JAMMAILA-SKIN</span></a>
+
+            <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+                <span class="nav__toggleBars" aria-hidden="true"></span>
+            </button>
+
+            <div class="nav__center" id="navMenu" data-collapsible>
+                <a class="nav__link" href="index.html#shop">Shop</a>
+                <a class="nav__link" href="index.html#benefits">About</a>
+                <a class="nav__link" href="index.html#footer">Contact</a>
+            </div>
+            <a class="nav__link" href="index.html#shop">Back to Store</a>
+        </div>
+    </nav>
+
+    <main class="checkout" aria-label="Checkout">
+        <div class="container checkout__inner">
+            <section class="checkout__left" aria-label="Checkout form">
+                <header class="checkout__head">
+                    <h1 class="checkout__title">Checkout</h1>
+                    <p class="checkout__sub">Philippines-only delivery. Please confirm your shipping details carefully.</p>
+                </header>
+
+                <form id="checkout-form" class="checkoutForm" novalidate>
+                    <section id="step-shipping" class="checkout-step active" aria-label="Step 1: Shipping">
+                        <div class="checkoutCard">
+                            <h2 class="checkoutCard__title">Contact</h2>
+                            <div class="formGrid formGrid--2">
+                                <label class="field">
+                                    <span class="field__label">First name</span>
+                                    <input class="field__input" type="text" id="first-name" required />
+                                    <span class="field__error" data-error-for="first-name"></span>
+                                </label>
+                                <label class="field">
+                                    <span class="field__label">Last name</span>
+                                    <input class="field__input" type="text" id="last-name" required />
+                                    <span class="field__error" data-error-for="last-name"></span>
+                                </label>
+                            </div>
+
+                            <div class="formGrid">
+                                <label class="field">
+                                    <span class="field__label">Mobile number (PH)</span>
+                                    <input class="field__input" type="tel" id="phone" inputmode="numeric" placeholder="09XXXXXXXXX" required />
+                                    <span class="field__hint">We only accept valid 11-digit Philippine mobile numbers.</span>
+                                    <span class="field__error" data-error-for="phone"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="checkoutCard">
+                            <h2 class="checkoutCard__title">Shipping</h2>
+
+                            <div class="formGrid">
+                                <label class="field">
+                                    <span class="field__label">Country/Region</span>
+                                    <select class="field__input" id="country" disabled>
+                                        <option selected>Philippines</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="formGrid formGrid--2">
+                                <label class="field">
+                                    <span class="field__label">Region/Province</span>
+                                    <select class="field__input" id="region" required>
+                                        <option value="" selected disabled>Select region</option>
+                                        <option value="NCR">NCR (Metro Manila)</option>
+                                        <option value="CAR">CAR</option>
+                                        <option value="Region I">Region I (Ilocos)</option>
+                                        <option value="Region II">Region II (Cagayan Valley)</option>
+                                        <option value="Region III">Region III (Central Luzon)</option>
+                                        <option value="Region IV-A">Region IV-A (CALABARZON)</option>
+                                        <option value="Region IV-B">Region IV-B (MIMAROPA)</option>
+                                        <option value="Region V">Region V (Bicol)</option>
+                                        <option value="Region VI">Region VI (Western Visayas)</option>
+                                        <option value="Region VII">Region VII (Central Visayas)</option>
+                                        <option value="Region VIII">Region VIII (Eastern Visayas)</option>
+                                        <option value="Region IX">Region IX (Zamboanga Peninsula)</option>
+                                        <option value="Region X">Region X (Northern Mindanao)</option>
+                                        <option value="Region XI">Region XI (Davao Region)</option>
+                                        <option value="Region XII">Region XII (SOCCSKSARGEN)</option>
+                                        <option value="Region XIII">Region XIII (Caraga)</option>
+                                        <option value="BARMM">BARMM</option>
+                                    </select>
+                                    <span class="field__error" data-error-for="region"></span>
+                                </label>
+                                <label class="field">
+                                    <span class="field__label">City/Municipality</span>
+                                    <input class="field__input" type="text" id="city" required />
+                                    <span class="field__error" data-error-for="city"></span>
+                                </label>
+                            </div>
+
+                            <div class="formGrid formGrid--2">
+                                <label class="field">
+                                    <span class="field__label">Barangay</span>
+                                    <input class="field__input" type="text" id="barangay" required />
+                                    <span class="field__error" data-error-for="barangay"></span>
+                                </label>
+                                <label class="field">
+                                    <span class="field__label">Postal code</span>
+                                    <input class="field__input" type="text" id="postal" inputmode="numeric" required />
+                                    <span class="field__error" data-error-for="postal"></span>
+                                </label>
+                            </div>
+
+                            <div class="formGrid">
+                                <label class="field">
+                                    <span class="field__label">Street Name, Building, House No.</span>
+                                    <input class="field__input" type="text" id="street-detail" placeholder="Street name, building, subdivision, purok, house number" autocomplete="street-address" maxlength="200" required />
+                                    <span class="field__error" data-error-for="street-detail"></span>
+                                </label>
+                            </div>
+
+                            <div class="checkoutStepActions">
+                                <button class="checkoutProceedBtn" type="button" id="proceed-to-payment">PROCEED TO PAYMENT</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="step-payment" class="checkout-step" aria-label="Step 2: Payment">
+                        <a href="#" class="checkoutBackLink" id="back-to-shipping">← Return to shipping information</a>
+
+                        <div class="checkoutCard">
+                            <h2 class="checkoutCard__title">Payment</h2>
+
+                            <div class="gatewayList" role="radiogroup" aria-label="Select payment method">
+                                <label class="gatewayOption" data-gateway-option>
+                                    <input type="radio" name="payment" value="maya" />
+                                    <span class="gatewayOption__left">
+                                        <span class="gatewayOption__dot" aria-hidden="true"></span>
+                                        <span>
+                                            <div class="gatewayOption__title">E-Wallets</div>
+                                            <div class="gatewayOption__sub">Maya</div>
+                                        </span>
+                                    </span>
+                                </label>
+
+                                <label class="gatewayOption" data-gateway-option>
+                                    <input type="radio" name="payment" value="gcash" checked />
+                                    <span class="gatewayOption__left">
+                                        <span class="gatewayOption__dot" aria-hidden="true"></span>
+                                        <span>
+                                            <div class="gatewayOption__title">E-Wallets</div>
+                                            <div class="gatewayOption__sub">GCash</div>
+                                        </span>
+                                    </span>
+                                </label>
+
+                                <label class="gatewayOption" data-gateway-option>
+                                    <input type="radio" name="payment" value="bank" />
+                                    <span class="gatewayOption__left">
+                                        <span class="gatewayOption__dot" aria-hidden="true"></span>
+                                        <span>
+                                            <div class="gatewayOption__title">Bank Transfer</div>
+                                            <div class="gatewayOption__sub">BDO / BPI / Metrobank</div>
+                                        </span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="payment-dynamic-panel" style="margin-top: 14px;">
+                                <div id="panel-gcash" class="payment-panel-content active" aria-live="polite">
+                                    <div class="payment-panel-title" id="ewallet-payment-heading">Pay with GCash</div>
+                                    <div class="payment-panel-copy">Scan the QR code using your e-wallet app. After payment, upload your screenshot receipt.</div>
+                                    <div class="qr-frame-wrapper">
+                                        <img id="ewallet-payment-qr" class="payment-qr-img" src="assets/images/gcash.jpg.png" alt="Official QR Code" />
+                                    </div>
+                                    <div class="uploadField">
+                                        <input class="uploadField__input" type="file" id="upload-gcash" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" />
+                                        <label class="uploadField__btn" for="upload-gcash">Upload receipt</label>
+                                        <div class="uploadField__name" data-upload-name-for="upload-gcash">No file chosen</div>
+                                    </div>
+                                </div>
+
+                                <div id="panel-bank" class="payment-panel-content" aria-live="polite">
+                                    <div class="payment-panel-title">Bank Transfer via Metrobank / InstaPay</div>
+                                    <div class="payment-panel-copy">Scan the QR code using your banking or e-wallet app. After payment, upload your payment receipt below.</div>
+                                    <div class="qr-frame-wrapper">
+                                        <img class="payment-qr-img" src="assets/payment/metro.jpg.png" alt="Metrobank InstaPay payment QR code" />
+                                    </div>
+                                    <div class="uploadField">
+                                        <input class="uploadField__input" type="file" id="upload-bank" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" />
+                                        <label class="uploadField__btn" for="upload-bank">Upload receipt</label>
+                                        <div class="uploadField__name" data-upload-name-for="upload-bank">No file chosen</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checkoutActions">
+                            <button class="checkoutPlaceOrder" type="submit" id="pay-now">PAY NOW</button>
+                        </div>
+                    </section>
+                </form>
+            </section>
+
+            <aside class="checkout__right" aria-label="Order summary">
+                <div class="summaryCard">
+                    <div class="summaryCard__head">
+                        <h2 class="summaryCard__title">Order Summary</h2>
+                        <a class="summaryCard__edit" href="index.html#shop">Edit cart</a>
+                    </div>
+
+                    <div id="summary-items" class="summaryItems"></div>
+
+                    <div class="summaryTotals">
+                        <div class="summaryRow">
+                            <span>Subtotal</span>
+                            <span id="summary-subtotal">₱ 0.00</span>
+                        </div>
+                        <div class="summaryRow">
+                            <span>Shipping</span>
+                            <span id="summary-shipping">₱ 0.00</span>
+                        </div>
+                        <div class="summaryRow summaryRow--total">
+                            <span>Total</span>
+                            <span id="summary-total">₱ 0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <div id="order-success-modal" class="orderSuccessModal" aria-hidden="true">
+        <div class="orderSuccessModal__backdrop" data-order-success-close></div>
+        <div class="orderSuccessModal__card" role="dialog" aria-modal="true" aria-label="Order success">
+            <button class="orderSuccessModal__close" type="button" data-order-success-close aria-label="Close">×</button>
+            <div class="orderSuccessModal__icon">✓</div>
+            <h2 class="orderSuccessModal__title">Order Successful</h2>
+            <p class="orderSuccessModal__sub">Thank you for your purchase. Your receipt is ready below.</p>
+
+            <div class="orderReceipt">
+                <div class="orderReceipt__row">
+                    <span>Reference No.</span>
+                    <strong id="receipt-ref">#JS-10001</strong>
+                </div>
+                <div class="orderReceipt__row">
+                    <span>Date</span>
+                    <strong id="receipt-date">—</strong>
+                </div>
+                <div class="orderReceipt__row">
+                    <span>Payment Method</span>
+                    <strong id="receipt-payment">—</strong>
+                </div>
+                <div id="receipt-items" style="padding: 8px 0;"></div>
+                <div class="orderReceipt__row">
+                    <span>Subtotal</span>
+                    <strong id="receipt-subtotal">₱ 0.00</strong>
+                </div>
+                <div class="orderReceipt__row">
+                    <span>Shipping Fee</span>
+                    <strong id="receipt-shipping">₱ 0.00</strong>
+                </div>
+                <div class="orderReceipt__row orderReceipt__row--total">
+                    <span>Grand Total</span>
+                    <strong id="receipt-total">₱ 0.00</strong>
+                </div>
+            </div>
+
+            <button class="orderReceipt__print" type="button" id="receipt-print">Print / Save Receipt</button>
+        </div>
+    </div>
+
+    <script>console.log('[checkout] checkout.html loaded');</script>
+    <script src="checkout.js" defer></script>
+</body>
+
+</html>

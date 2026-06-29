@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JammailaV-skin Admin | Login</title>
+    <link rel="icon" href="data:,">
+    <style>
+        .login-box { width: 90%; max-width: 400px; margin: 100px auto; padding: 2rem; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .login-btn { background: #d4a373; color: white; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; width: 100%; min-height: 44px; }
+        body { font-family: sans-serif; background: #fdf8f5; padding: 2rem; color: #4a4a4a; }
+
+        .toastHost { position: fixed; top: 18px; right: 18px; z-index: 9999; display: grid; gap: 10px; pointer-events: none; }
+        .toast {
+            pointer-events: auto;
+            display: grid;
+            grid-template-columns: 22px 1fr;
+            gap: 10px;
+            align-items: center;
+            width: min(360px, calc(100vw - 36px));
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.14);
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.86);
+            color: #1f1f1f;
+            transform: translateY(-8px);
+            opacity: 0;
+            transition: transform 220ms ease, opacity 220ms ease;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast__icon { width: 22px; height: 22px; display: grid; place-items: center; }
+        .toast__msg { margin: 0; font-size: 0.95rem; line-height: 1.35; text-align: left; }
+        .toast--success { background: rgba(46, 167, 111, 0.14); border-color: rgba(46, 167, 111, 0.22); }
+        .toast--success .toast__icon { color: #1f9d68; }
+        .toast--error { background: rgba(255, 91, 123, 0.14); border-color: rgba(255, 91, 123, 0.22); }
+        .toast--error .toast__icon { color: #ff5b7b; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2 style="color: #d4a373;">JammailaV-skin Admin Login</h2>
+        <form id="adminLoginForm" action="javascript:void(0)" autocomplete="off">
+            <input type="email" id="email" placeholder="Email Address" required>
+            <input type="password" id="pass" placeholder="Password" required>
+            <button class="login-btn" type="submit">Sign In</button>
+        </form>
+    </div>
+
+    <div class="toastHost" aria-live="polite" aria-atomic="true" id="toastHost"></div>
+
+    <script>
+        (function () {
+            const DASHBOARD_URL = 'admin.html';
+            const API_BASE_URL = 'http://localhost:3000';
+
+            const form = document.getElementById('adminLoginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('pass');
+            const host = document.getElementById('toastHost');
+            if (!form || !emailInput || !passwordInput || !host) return;
+
+            const iconCheck = `
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            `;
+
+            const iconError = `
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 9v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M12 17h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M10.3 4.2 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+            `;
+
+            function showToast(type, message, durationMs) {
+                const toast = document.createElement('div');
+                toast.className = `toast toast--${type}`;
+                toast.setAttribute('role', 'status');
+
+                const icon = type === 'success' ? iconCheck : iconError;
+                toast.innerHTML = `
+                    <div class="toast__icon">${icon}</div>
+                    <p class="toast__msg">${message}</p>
+                `;
+
+                host.appendChild(toast);
+                requestAnimationFrame(() => toast.classList.add('show'));
+
+                window.setTimeout(() => {
+                    toast.classList.remove('show');
+                    window.setTimeout(() => toast.remove(), 220);
+                }, durationMs);
+            }
+
+            function normalize(v) {
+                return String(v || '').trim();
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                console.log('Captured Email:', emailInput.value);
+                console.log('Captured Password:', passwordInput.value);
+
+                const sanitizedEmail = emailInput.value.trim().toLowerCase();
+                const sanitizedPassword = passwordInput.value.trim();
+
+                console.log('[AdminLogin] sanitizedEmail:', JSON.stringify(sanitizedEmail));
+
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword })
+                    });
+
+                    const data = await res.json().catch(() => null);
+                    if (!res.ok) {
+                        const msg = String(data?.error || data?.message || 'Invalid email or password. Please try again.');
+                        showToast('error', msg, 2200);
+                        return;
+                    }
+
+                    const token = String(data?.token || '').trim();
+                    const isAdmin = Boolean(data?.isAdmin);
+                    if (!token) {
+                        showToast('error', 'Login failed: missing token.', 2200);
+                        return;
+                    }
+                    if (!isAdmin) {
+                        showToast('error', 'This account is not an admin.', 2200);
+                        localStorage.removeItem('jammailavskin_token');
+                        localStorage.removeItem('isAdminLoggedIn');
+                        return;
+                    }
+
+                    localStorage.setItem('jammailavskin_token', token);
+                    localStorage.setItem('isAdminLoggedIn', 'true');
+
+                    showToast('success', 'Login successful! Redirecting...', 1200);
+                    window.setTimeout(() => {
+                        window.location.href = DASHBOARD_URL;
+                    }, 1200);
+                } catch (err) {
+                    console.error('[AdminLogin] login request failed', err);
+                    showToast('error', 'Login failed. Please try again.', 2200);
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

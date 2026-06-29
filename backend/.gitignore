@@ -1,0 +1,14 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+# Customer-uploaded files
+public/uploads/
+
+# Generated Prisma engine
+query_engine*.dll.node
+
+# Local seed file containing admin credentials
+seed.js
