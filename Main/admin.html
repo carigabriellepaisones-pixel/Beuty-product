@@ -1649,13 +1649,16 @@
             </div>
         </main>
     </div>
-
+<script src="config.js"></script>
     <script>
         if (!localStorage.getItem('jammailavskin_token') || localStorage.getItem('isAdminLoggedIn') !== 'true') {
             window.location.href = 'login.html';
         }
 
-        const API_BASE_URL = 'http://localhost:3000';
+               const API_BASE_URL = window.APP_CONFIG?.API_BASE_URL;
+        if (!API_BASE_URL) {
+            throw new Error('Missing API_BASE_URL in config.js');
+        }
 
         async function saveDbOrderField(orderId, payload) {
             const numericId = Number(orderId);

@@ -10,7 +10,6 @@
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
         .login-btn { background: #d4a373; color: white; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; width: 100%; min-height: 44px; }
         body { font-family: sans-serif; background: #fdf8f5; padding: 2rem; color: #4a4a4a; }
-
         .toastHost { position: fixed; top: 18px; right: 18px; z-index: 9999; display: grid; gap: 10px; pointer-events: none; }
         .toast {
             pointer-events: auto;
@@ -50,12 +49,14 @@
     </div>
 
     <div class="toastHost" aria-live="polite" aria-atomic="true" id="toastHost"></div>
-
+<script src="config.js"></script>
     <script>
         (function () {
             const DASHBOARD_URL = 'admin.html';
-            const API_BASE_URL = 'http://localhost:3000';
-
+            const API_BASE_URL = window.APP_CONFIG?.API_BASE_URL;
+if (!API_BASE_URL) {
+    throw new Error('Missing API_BASE_URL in config.js');
+}
             const form = document.getElementById('adminLoginForm');
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('pass');
@@ -95,11 +96,9 @@
                     window.setTimeout(() => toast.remove(), 220);
                 }, durationMs);
             }
-
             function normalize(v) {
                 return String(v || '').trim();
             }
-
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
@@ -124,7 +123,6 @@
                         showToast('error', msg, 2200);
                         return;
                     }
-
                     const token = String(data?.token || '').trim();
                     const isAdmin = Boolean(data?.isAdmin);
                     if (!token) {
@@ -137,7 +135,6 @@
                         localStorage.removeItem('isAdminLoggedIn');
                         return;
                     }
-
                     localStorage.setItem('jammailavskin_token', token);
                     localStorage.setItem('isAdminLoggedIn', 'true');
 
