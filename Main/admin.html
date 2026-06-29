@@ -2243,7 +2243,6 @@
                 const t = String(typeEl.value || '').toUpperCase();
                 const isBundle = t === 'BUNDLE' || t === 'PACKAGE';
                 includesWrapEl.style.display = isBundle ? '' : 'none';
-                if (!isBundle && includesEl) includesEl.value = '';
             }
             if (priceEl) priceEl.value = product.price ?? '';
             if (stockEl) stockEl.value = product.stock ?? 0;
@@ -2355,26 +2354,6 @@
             };
 
             try {
-                if (previousLayerKey !== targetLayerKey) {
-                    const layerRes = await fetch(`${API_BASE_URL}/api/admin/products/${id}/storefront-layer`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ storefrontLayer: nextStorefrontLayer })
-                    });
-
-                    let layerData = null;
-                    try { layerData = await layerRes.json(); } catch {}
-
-                    if (!layerRes.ok) {
-                        const msg = layerData?.error || layerData?.message || `Failed to update product layer (HTTP ${layerRes.status}).`;
-                        showAdminToast({ type: 'error', text: String(msg) });
-                        return;
-                    }
-                }
-
                 const form = new FormData();
                 form.append('name', name);
                 form.append('price', String(price));
@@ -2383,6 +2362,7 @@
                 form.append('usageInstructions', usageInstructions);
                 form.append('type', normalizedType);
                 form.append('includes', includes);
+                form.append('storefrontLayer', String(nextStorefrontLayer));
                 form.append('existingImageUrl', existingImageUrl);
                 if (file) form.append('image', file);
 

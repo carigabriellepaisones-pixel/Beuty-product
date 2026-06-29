@@ -529,9 +529,16 @@ app.put(
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid product id" });
 
-    const { name, price, stock, description, usageInstructions, existingImageUrl, type, includes } = req.body;
+    const { name, price, stock, description, usageInstructions, existingImageUrl, type, includes, storefrontLayer } = req.body;
     if (!name || price === undefined) {
       return res.status(400).json({ error: "name and price are required" });
+    }
+
+    const layerParsed = storefrontLayer === undefined || storefrontLayer === null || String(storefrontLayer).trim() === ""
+      ? null
+      : Number(storefrontLayer);
+    if (layerParsed !== null && (!Number.isFinite(layerParsed) || (layerParsed !== 1 && layerParsed !== 2))) {
+      return res.status(400).json({ error: "Invalid storefrontLayer (must be 1 or 2)" });
     }
 
     const normalizedType = type === "BUNDLE" ? "BUNDLE" : "SINGLE";
@@ -556,6 +563,7 @@ app.put(
             usageInstructions: usageInstructions || null,
             type: normalizedType,
             includes: normalizedType === "BUNDLE" && normalizedIncludes ? normalizedIncludes : null,
+            ...(layerParsed === null ? null : { storefrontLayer: layerParsed }),
           },
         })
       );
