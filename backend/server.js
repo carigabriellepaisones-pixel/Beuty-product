@@ -31,9 +31,33 @@ process.on("uncaughtException", (error) => {
   console.error("[uncaughtException]", error);
 });
 
+const isProd = String(process.env.NODE_ENV || "").toLowerCase() === "production";
+const FRONTEND_ORIGIN_RAW = process.env.FRONTEND_ORIGIN;
+const FRONTEND_ORIGIN = FRONTEND_ORIGIN_RAW
+  ? String(FRONTEND_ORIGIN_RAW).trim().replace(/\/+$/, "")
+  : "";
+
+if (isProd && !FRONTEND_ORIGIN) {
+  throw new Error("Missing required FRONTEND_ORIGIN environment variable");
+}
+
+const allowedOrigins = new Set();
+
+if (!isProd) {
+  allowedOrigins.add("http://localhost:8080");
+}
+
+if (FRONTEND_ORIGIN) {
+  allowedOrigins.add(FRONTEND_ORIGIN);
+}
+
 app.use(
   cors({
-    origin: true,
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.has(origin)) return cb(null, true);
+      return cb(new Error(`CORS blocked for origin: ${origin}`));
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
   })
