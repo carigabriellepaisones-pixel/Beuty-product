@@ -117,7 +117,10 @@ app.delete(
 );
 
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || "dev_jwt_secret_change_me";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET || !JWT_SECRET.trim()) {
+  throw new Error("Missing required JWT_SECRET environment variable");
+}
 
 const uploadsDir = path.join(__dirname, "public", "uploads");
 fs.mkdirSync(uploadsDir, { recursive: true });

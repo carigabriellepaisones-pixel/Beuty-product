@@ -6,7 +6,12 @@ const ORDERS_KEY_COMPAT = 'orders';
 const ORDERS_KEY_ADMIN = 'jammailavskin_orders';
 const CHECKOUT_SNAPSHOT_KEY = 'jammaila_checkout_snapshot_v1';
 
-const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:3000`;
+const API_BASE_URL_RAW = window.APP_CONFIG?.API_BASE_URL;
+if (!API_BASE_URL_RAW || !String(API_BASE_URL_RAW).trim()) {
+    throw new Error('Missing API_BASE_URL in config.js');
+}
+
+const API_BASE_URL = String(API_BASE_URL_RAW).trim().replace(/\/+$/, '');
 
 function escapeHtml(value) {
     const element = document.createElement('div');
