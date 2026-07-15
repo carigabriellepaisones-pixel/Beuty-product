@@ -2,7 +2,6 @@ const express = require("express");
 
 const cors = require("cors");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const path = require("path");
 const fs = require("fs");
@@ -36,6 +35,10 @@ const FRONTEND_ORIGIN_RAW = process.env.FRONTEND_ORIGIN;
 const FRONTEND_ORIGIN = FRONTEND_ORIGIN_RAW
   ? String(FRONTEND_ORIGIN_RAW).trim().replace(/\/+$/, "")
   : "";
+
+const ADMIN_USERNAME = String(process.env.ADMIN_USERNAME || "").trim();
+const ADMIN_PASSWORD = String(process.env.ADMIN_PASSWORD || "");
+const ADMIN_PASSWORD_HASH = String(process.env.ADMIN_PASSWORD_HASH || "");
 
 if (isProd && !FRONTEND_ORIGIN) {
   throw new Error("Missing required FRONTEND_ORIGIN environment variable");
@@ -143,10 +146,6 @@ app.delete(
 );
 
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET || !JWT_SECRET.trim()) {
-  throw new Error("Missing required JWT_SECRET environment variable");
-}
 
 const uploadsDir = path.join(__dirname, "public", "uploads");
 fs.mkdirSync(uploadsDir, { recursive: true });
@@ -229,23 +228,51 @@ async function withDbRetry(operation) {
   }
 }
 
-function getBearerToken(req) {
+function getBasicCredentials(req) {
   const authHeader = req.headers.authorization;
   if (!authHeader) return null;
-  const [type, token] = authHeader.split(" ");
-  if (type !== "Bearer" || !token) return null;
-  return token;
+  const [type, value] = String(authHeader).split(" ");
+  if (type !== "Basic" || !value) return null;
+  try {
+    const decoded = Buffer.from(String(value), "base64").toString("utf8");
+    const idx = decoded.indexOf(":");
+    if (idx === -1) return null;
+    const username = decoded.slice(0, idx);
+    const password = decoded.slice(idx + 1);
+    return { username, password };
+  } catch {
+    return null;
+  }
 }
 
-function requireAuth(req, res, next) {
-  const token = getBearerToken(req);
-  if (!token) return res.status(401).json({ error: "Missing token" });
-  try {
-    req.user = jwt.verify(token, JWT_SECRET);
-    return next();
-  } catch {
-    return res.status(401).json({ error: "Invalid token" });
+async function requireAuth(req, res, next) {
+  const creds = getBasicCredentials(req);
+  if (!creds) return res.status(401).json({ error: "Missing credentials" });
+
+  if (!ADMIN_USERNAME) {
+    return res.status(500).json({ error: "Server misconfigured: missing ADMIN_USERNAME" });
   }
+
+  const usernameOk = String(creds.username || "").trim() === ADMIN_USERNAME;
+  if (!usernameOk) return res.status(401).json({ error: "Invalid credentials" });
+
+  const passRaw = String(creds.password || "");
+  if (ADMIN_PASSWORD_HASH && ADMIN_PASSWORD_HASH.trim()) {
+    try {
+      const ok = await bcrypt.compare(passRaw, ADMIN_PASSWORD_HASH);
+      if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+    } catch {
+      return res.status(500).json({ error: "Server misconfigured: invalid ADMIN_PASSWORD_HASH" });
+    }
+  } else {
+    if (!ADMIN_PASSWORD) {
+      return res.status(500).json({ error: "Server misconfigured: missing ADMIN_PASSWORD or ADMIN_PASSWORD_HASH" });
+    }
+    if (passRaw !== ADMIN_PASSWORD) return res.status(401).json({ error: "Invalid credentials" });
+  }
+
+  req.user = { isAdmin: true, username: ADMIN_USERNAME };
+  return next();
 }
 
 function requireAdmin(req, res, next) {
@@ -316,13 +343,7 @@ app.post(
         })
       );
 
-      const token = jwt.sign(
-        { userId: user.id, email: user.email, isAdmin: user.isAdmin },
-        JWT_SECRET,
-        { expiresIn: "24h" }
-      );
-
-      return res.json({ token, isAdmin: user.isAdmin });
+      return res.json({ ok: true, isAdmin: user.isAdmin, user });
     } catch {
       return res.status(500).json({ error: "Signup failed" });
     }
@@ -339,23 +360,31 @@ app.post(
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    try {
-      const user = await withDbRetry(() => prisma.user.findUnique({ where: { email } }));
-      if (!user) return res.status(401).json({ error: "Invalid credentials" });
-
-      const valid = await bcrypt.compare(password, user.passwordHash);
-      if (!valid) return res.status(401).json({ error: "Invalid credentials" });
-
-      const token = jwt.sign(
-        { userId: user.id, email: user.email, isAdmin: user.isAdmin },
-        JWT_SECRET,
-        { expiresIn: "24h" }
-      );
-
-      return res.json({ token, isAdmin: user.isAdmin });
-    } catch {
-      return res.status(500).json({ error: "Login failed" });
+    if (!ADMIN_USERNAME) {
+      return res.status(500).json({ error: "Server misconfigured: missing ADMIN_USERNAME" });
     }
+
+    const incomingUser = String(email || "").trim().toLowerCase();
+    const expectedUser = String(ADMIN_USERNAME || "").trim().toLowerCase();
+    const usernameOk = incomingUser === expectedUser || incomingUser.startsWith(`${expectedUser}@`);
+    if (!usernameOk) return res.status(401).json({ error: "Invalid credentials" });
+
+    const passRaw = String(password || "");
+    if (ADMIN_PASSWORD_HASH && ADMIN_PASSWORD_HASH.trim()) {
+      try {
+        const ok = await bcrypt.compare(passRaw, ADMIN_PASSWORD_HASH);
+        if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+      } catch {
+        return res.status(500).json({ error: "Server misconfigured: invalid ADMIN_PASSWORD_HASH" });
+      }
+    } else {
+      if (!ADMIN_PASSWORD) {
+        return res.status(500).json({ error: "Server misconfigured: missing ADMIN_PASSWORD or ADMIN_PASSWORD_HASH" });
+      }
+      if (passRaw !== ADMIN_PASSWORD) return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    return res.json({ ok: true, isAdmin: true });
   })
 );
 
@@ -616,20 +645,8 @@ app.post(
   "/api/orders",
   upload.single("receipt"),
   asyncHandler(async (req, res) => {
-    // Optional auth: allow guest checkout, but link to a user when a token is present
-    let requestUserId = null;
-    try {
-      const maybeToken = getBearerToken(req);
-      if (maybeToken) {
-        const decoded = jwt.verify(maybeToken, JWT_SECRET);
-        const idCandidate = decoded?.userId ?? decoded?.id;
-        if (idCandidate !== undefined && idCandidate !== null && String(idCandidate).trim() !== "") {
-          requestUserId = Number(idCandidate);
-        }
-      }
-    } catch {
-      requestUserId = null;
-    }
+    // Guest checkout: no authentication token is required.
+    const requestUserId = null;
 
     const {
       userId,

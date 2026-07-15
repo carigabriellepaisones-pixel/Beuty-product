@@ -1653,7 +1653,21 @@
     </div>
 <script src="config.js"></script>
     <script>
-        if (!localStorage.getItem('jammailavskin_token') || localStorage.getItem('isAdminLoggedIn') !== 'true') {
+        function getBasicToken() {
+            const raw = String(window.name || '');
+            const prefix = 'jammailavskin_basic:';
+            if (!raw.startsWith(prefix)) return '';
+            return raw.slice(prefix.length).trim();
+        }
+
+        function getBasicAuthHeader() {
+            const token = getBasicToken();
+            if (!token) return '';
+            return `Basic ${token}`;
+        }
+
+        const basicAuthHeader = getBasicAuthHeader();
+        if (!basicAuthHeader) {
             window.location.href = 'login.html';
         }
 
@@ -1665,8 +1679,8 @@
         async function saveDbOrderField(orderId, payload) {
             const numericId = Number(orderId);
             if (!Number.isFinite(numericId)) return;
-            const token = localStorage.getItem('jammailavskin_token');
-            if (!token) {
+            const authHeader = getBasicAuthHeader();
+            if (!authHeader) {
                 showAdminToast({ type: 'error', text: 'You are logged out. Please login again.' });
                 return;
             }
@@ -1676,7 +1690,7 @@
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': authHeader
                     },
                     body: JSON.stringify(payload)
                 });
@@ -1703,6 +1717,13 @@
         const STORAGE_KEYS = {
             products: 'products',
             orders: 'orders'
+        };
+
+        const inMemoryStore = {
+            storeProducts: [],
+            storeProductsLayer2: [],
+            storefrontLayerServerSyncV1: false,
+            orders: []
         };
 
         let productsCache = [];
@@ -1736,8 +1757,7 @@
 
         function getStoreProducts() {
             try {
-                const raw = JSON.parse(localStorage.getItem('storeProducts') || '[]');
-                return Array.isArray(raw) ? raw : [];
+                return Array.isArray(inMemoryStore.storeProducts) ? inMemoryStore.storeProducts : [];
             } catch {
                 return [];
             }
@@ -1745,19 +1765,20 @@
 
         function getStoreProductsByKey(key) {
             try {
-                const raw = JSON.parse(localStorage.getItem(String(key || 'storeProducts')) || '[]');
-                return Array.isArray(raw) ? raw : [];
+                const k = String(key || 'storeProducts');
+                const list = inMemoryStore[k];
+                return Array.isArray(list) ? list : [];
             } catch {
                 return [];
             }
         }
 
         function setStoreProducts(items) {
-            localStorage.setItem('storeProducts', JSON.stringify(Array.isArray(items) ? items : []));
+            inMemoryStore.storeProducts = Array.isArray(items) ? items : [];
         }
 
         function setStoreProductsByKey(key, items) {
-            localStorage.setItem(String(key || 'storeProducts'), JSON.stringify(Array.isArray(items) ? items : []));
+            inMemoryStore[String(key || 'storeProducts')] = Array.isArray(items) ? items : [];
         }
 
         function setProducts(products) {
@@ -1775,14 +1796,13 @@
                 try {
                     const byId = new Map(apiProducts.map((p) => [Number(p?.id), p]).filter(([id]) => Number.isFinite(id)));
 
-                    const hasSynced = localStorage.getItem('storefrontLayerServerSyncV1') === 'true';
+                    const hasSynced = Boolean(inMemoryStore.storefrontLayerServerSyncV1);
                     if (!hasSynced) {
-                        const token = localStorage.getItem('jammailavskin_token');
-                        if (token) {
+                        const authHeader = getBasicAuthHeader();
+                        if (authHeader) {
                             const fromLayerKey = (key) => {
                                 try {
-                                    const raw = JSON.parse(localStorage.getItem(String(key)) || '[]');
-                                    return Array.isArray(raw) ? raw : [];
+                                    return getStoreProductsByKey(String(key));
                                 } catch {
                                     return [];
                                 }
@@ -1807,7 +1827,7 @@
                                     const r = await fetch(`${API_BASE_URL}/api/admin/products/${id}/storefront-layer`, {
                                         method: 'PATCH',
                                         headers: {
-                                            'Authorization': `Bearer ${token}`,
+                                            'Authorization': authHeader,
                                             'Content-Type': 'application/json'
                                         },
                                         body: JSON.stringify({ storefrontLayer: layer })
@@ -1826,7 +1846,7 @@
                                     await syncOne(id, 2);
                                 }
 
-                                localStorage.setItem('storefrontLayerServerSyncV1', 'true');
+                                inMemoryStore.storefrontLayerServerSyncV1 = true;
                                 await fetchProductsFromApi();
                                 return apiProducts;
                             }
@@ -1870,8 +1890,8 @@
         }
 
         async function fetchOrdersFromApi() {
-            const token = localStorage.getItem('jammailavskin_token');
-            if (!token) {
+            const authHeader = getBasicAuthHeader();
+            if (!authHeader) {
                 ordersApiCache = [];
                 ordersApiLoaded = true;
                 ordersApiLoadError = 'Missing admin token.';
@@ -1880,12 +1900,10 @@
 
             try {
                 const res = await fetch(`${API_BASE_URL}/api/admin/orders`, {
-                    headers: { 'Authorization': `Bearer ${token}` },
+                    headers: { 'Authorization': authHeader },
                     credentials: 'include'
                 });
                 if (res.status === 401 || res.status === 403) {
-                    localStorage.removeItem('jammailavskin_token');
-                    localStorage.removeItem('isAdminLoggedIn');
                     try { showAdminToast({ type: 'error', text: 'Session expired. Please login again.' }); } catch {}
                     window.location.href = 'login.html';
                     ordersApiCache = [];
@@ -1933,7 +1951,7 @@
 
         function getOrders() {
             try {
-                const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS.orders) || '[]');
+                const raw = Array.isArray(inMemoryStore.orders) ? inMemoryStore.orders : [];
                 const normalized = raw.map(normalizeOrder);
                 const changed = normalized.some((o, i) => JSON.stringify(o) !== JSON.stringify(raw[i]));
                 if (changed) setOrders(normalized);
@@ -1944,7 +1962,7 @@
         }
 
         function setOrders(orders) {
-            localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(orders));
+            inMemoryStore.orders = Array.isArray(orders) ? orders : [];
         }
 
         function formatMoney(amount) {
@@ -2288,8 +2306,8 @@
             const saveBtn = modal.querySelector('#editSaveBtn');
             if (saveBtn && saveBtn.disabled) return;
 
-            const token = localStorage.getItem('jammailavskin_token');
-            if (!token) {
+            const authHeader = getBasicAuthHeader();
+            if (!authHeader) {
                 showAdminToast({ type: 'error', text: 'You are logged out. Please login again.' });
                 return;
             }
@@ -2374,7 +2392,7 @@
                 const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': authHeader
                     },
                     body: form
                 });
@@ -2469,8 +2487,8 @@
 
             const file = imageEl?.files?.[0];
 
-            const token = localStorage.getItem('jammailavskin_token');
-            if (!token) {
+            const authHeader = getBasicAuthHeader();
+            if (!authHeader) {
                 showAdminToast({ type: 'error', text: 'You are logged out. Please login again.' });
                 return;
             }
@@ -2497,7 +2515,7 @@
                 const res = await fetch(`${API_BASE_URL}/api/products`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': authHeader
                     },
                     body: form
                 });
@@ -2587,8 +2605,8 @@
                 'This product'
             ).trim();
 
-            const token = localStorage.getItem('jammailavskin_token');
-            if (!token) {
+            const authHeader = getBasicAuthHeader();
+            if (!authHeader) {
                 showAdminToast({ type: 'error', text: 'You are logged out. Please login again.' });
                 return;
             }
@@ -2607,7 +2625,7 @@
             try {
                 const res = await fetch(`${API_BASE_URL}/api/admin/products/${productId}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 'Authorization': authHeader }
                 });
 
                 let data = null;
@@ -2708,8 +2726,8 @@
             console.log('[admin] deleting actual order ID:', idNum);
             if (!Number.isFinite(idNum)) return;
 
-            const token = localStorage.getItem('jammailavskin_token');
-            if (!token) {
+            const authHeader = getBasicAuthHeader();
+            if (!authHeader) {
                 showAdminToast({ type: 'error', text: 'You are logged out. Please login again.' });
                 return;
             }
@@ -2725,7 +2743,7 @@
             try {
                 const res = await fetch(`${API_BASE_URL}/api/admin/orders/${idNum}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 'Authorization': authHeader }
                 });
 
                 let data = null;
@@ -2764,8 +2782,8 @@
             const idNum = Number(orderId);
             if (!Number.isFinite(idNum)) return;
 
-            const token = localStorage.getItem('jammailavskin_token');
-            if (!token) {
+            const authHeader = getBasicAuthHeader();
+            if (!authHeader) {
                 showAdminToast({ type: 'error', text: 'You are logged out. Please login again.' });
                 return;
             }
@@ -2783,7 +2801,7 @@
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': authHeader
                     },
                     body: JSON.stringify({ orderStatus: 'Cancelled', paymentStatus: 'Failed' })
                 });
@@ -3500,8 +3518,8 @@
             }
 
             (async () => {
-                const token = localStorage.getItem('jammailavskin_token');
-                if (!token) {
+                const authHeader = getBasicAuthHeader();
+                if (!authHeader) {
                     showAdminToast({ type: 'error', text: 'You are logged out. Please login again.' });
                     renderAll();
                     return;
@@ -3693,8 +3711,8 @@
             const orderId = Number(btn.getAttribute('data-order-id'));
             if (!Number.isFinite(orderId)) return;
 
-            const token = localStorage.getItem('jammailavskin_token');
-            if (!token) {
+            const authHeader = getBasicAuthHeader();
+            if (!authHeader) {
                 showAdminToast({ type: 'error', text: 'You are logged out. Please login again.' });
                 return;
             }
@@ -3709,7 +3727,7 @@
                 const res = await fetch(`${API_BASE_URL}/api/admin/orders/${orderId}/complete`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': authHeader
                     }
                 });
 
@@ -4288,20 +4306,14 @@
         }
 
         function logout() {
-            localStorage.removeItem('jammailavskin_token');
-            localStorage.removeItem('isAdminLoggedIn');
-            sessionStorage.clear();
+            window.name = '';
             window.location.href = 'index.html';
         }
 
         function migrateProductsKey() {
             const newKey = STORAGE_KEYS.products;
             const oldKey = 'jammailavskin_products';
-            const hasNew = localStorage.getItem(newKey);
-            const hasOld = localStorage.getItem(oldKey);
-            if (!hasNew && hasOld) {
-                localStorage.setItem(newKey, hasOld);
-            }
+            return;
         }
 
         document.getElementById('nav').addEventListener('click', (e) => {
