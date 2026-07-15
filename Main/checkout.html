@@ -165,17 +165,6 @@
                                         </span>
                                     </span>
                                 </label>
-
-                                <label class="gatewayOption" data-gateway-option>
-                                    <input type="radio" name="payment" value="bank" />
-                                    <span class="gatewayOption__left">
-                                        <span class="gatewayOption__dot" aria-hidden="true"></span>
-                                        <span>
-                                            <div class="gatewayOption__title">Bank Transfer</div>
-                                            <div class="gatewayOption__sub">BDO / BPI / Metrobank</div>
-                                        </span>
-                                    </span>
-                                </label>
                             </div>
 
                             <div class="payment-dynamic-panel" style="margin-top: 14px;">
@@ -185,23 +174,17 @@
                                     <div class="qr-frame-wrapper">
                                         <img id="ewallet-payment-qr" class="payment-qr-img" src="assets/images/gcash.jpg.png" alt="Official QR Code" />
                                     </div>
+                                    <div class="gcash-verification-display" aria-label="GCash account details">
+                                        <div class="gcash-verification-label">GCash Account Name</div>
+                                        <div class="gcash-owner-name">Rhodora Logronio</div>
+                                        <div class="gcash-verification-label">GCash Number</div>
+                                        <div class="gcash-owner-number">0951 852 9400</div>
+                                        <div class="gcash-verification-note">Please verify the account name before sending your payment.</div>
+                                    </div>
                                     <div class="uploadField">
                                         <input class="uploadField__input" type="file" id="upload-gcash" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" />
                                         <label class="uploadField__btn" for="upload-gcash">Upload receipt</label>
                                         <div class="uploadField__name" data-upload-name-for="upload-gcash">No file chosen</div>
-                                    </div>
-                                </div>
-
-                                <div id="panel-bank" class="payment-panel-content" aria-live="polite">
-                                    <div class="payment-panel-title">Bank Transfer via Metrobank / InstaPay</div>
-                                    <div class="payment-panel-copy">Scan the QR code using your banking or e-wallet app. After payment, upload your payment receipt below.</div>
-                                    <div class="qr-frame-wrapper">
-                                        <img class="payment-qr-img" src="assets/payment/metro.jpg.png" alt="Metrobank InstaPay payment QR code" />
-                                    </div>
-                                    <div class="uploadField">
-                                        <input class="uploadField__input" type="file" id="upload-bank" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" />
-                                        <label class="uploadField__btn" for="upload-bank">Upload receipt</label>
-                                        <div class="uploadField__name" data-upload-name-for="upload-bank">No file chosen</div>
                                     </div>
                                 </div>
                             </div>
@@ -283,7 +266,7 @@
     </div>
 
     <script>console.log('[checkout] checkout.html loaded');</script>
-    <script src="config.js"></script>
+    <script src="config.js?v=2"></script>
     <script src="checkout.js" defer></script>
 </body>
 

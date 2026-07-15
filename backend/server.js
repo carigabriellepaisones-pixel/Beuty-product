@@ -45,6 +45,8 @@ const allowedOrigins = new Set();
 
 if (!isProd) {
   allowedOrigins.add("http://localhost:8080");
+  allowedOrigins.add("http://127.0.0.1:8080");
+  allowedOrigins.add("http://10.0.0.199:8080");
 }
 
 if (FRONTEND_ORIGIN) {
@@ -732,7 +734,8 @@ app.post(
     let order;
     try {
       order = await withDbRetry(() =>
-        prisma.$transaction(async (tx) => {
+        prisma.$transaction(
+          async (tx) => {
           const userUpdate = {};
           if (profileName) userUpdate.name = profileName;
           if (profilePhone) userUpdate.phone = profilePhone;
@@ -850,7 +853,11 @@ app.post(
             data: { receiptRef },
             include: { user: true, items: true },
           });
-        })
+          },
+          {
+            timeout: 15000,
+          }
+        )
       );
     } catch (e) {
       if (req.file && req.file.path) {
@@ -876,9 +883,23 @@ app.post(
         });
       }
 
+      if (e?.code === "P2022") {
+        return res.status(500).json({
+          success: false,
+          message: "The order could not be saved because the database schema is not synchronized.",
+        });
+      }
+
+      if (e?.code === "P2028") {
+        return res.status(500).json({
+          success: false,
+          message: "The order took too long to process. Please try again.",
+        });
+      }
+
       return res.status(500).json({
         success: false,
-        message: "The order could not be saved because the database schema is not synchronized.",
+        message: "Something went wrong, please try again!",
       });
     }
 

@@ -356,6 +356,7 @@ function initPaymentMethods() {
     const payNowBtn = qs('#pay-now') || qs('.checkoutPlaceOrder');
     const ewalletHeading = qs('#ewallet-payment-heading');
     const ewalletQr = qs('#ewallet-payment-qr');
+    const accountLabels = qsa('.gcash-verification-label');
 
     const map = {
         gcash: 'panel-gcash',
@@ -383,12 +384,18 @@ function initPaymentMethods() {
 
         if (ewalletQr) {
             if (selected === 'maya') {
-                ewalletQr.src = 'assets/payment/maya.jpg';
+                ewalletQr.src = 'assets/payment/maya1.png';
                 ewalletQr.alt = 'Maya payment QR code';
             } else if (selected === 'gcash') {
                 ewalletQr.src = 'assets/images/gcash.jpg.png';
                 ewalletQr.alt = 'GCash payment QR code';
             }
+        }
+
+        if (accountLabels.length >= 2) {
+            const labelPrefix = selected === 'maya' ? 'MAYA' : 'GCASH';
+            accountLabels[0].textContent = `${labelPrefix} ACCOUNT NAME`;
+            accountLabels[1].textContent = `${labelPrefix} NUMBER`;
         }
 
         cards.forEach((c) => c.classList.remove('is-selected'));

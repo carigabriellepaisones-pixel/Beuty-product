@@ -102,13 +102,10 @@ if (!API_BASE_URL) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                console.log('Captured Email:', emailInput.value);
-                console.log('Captured Password:', passwordInput.value);
 
                 const sanitizedEmail = emailInput.value.trim().toLowerCase();
                 const sanitizedPassword = passwordInput.value.trim();
 
-                console.log('[AdminLogin] sanitizedEmail:', JSON.stringify(sanitizedEmail));
 
                 try {
                     const res = await fetch(`${API_BASE_URL}/api/login`, {

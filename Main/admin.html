@@ -1455,7 +1455,9 @@
                             <div>
                                 <h2>Recent Orders</h2>
                                 <p class="hint">Quick view of the latest orders</p>
+                                <p class="hint" id="recentOrdersSummary" style="margin-top: 6px;"></p>
                             </div>
+                            <button class="btn secondary" type="button" onclick="showSection('orders')">View All Orders</button>
                         </div>
                         <div class="tableWrap" style="margin-top: 0.9rem;">
                             <table>
@@ -2876,20 +2878,52 @@
             const totalOrders = orders.length;
             const totalSales = orders.reduce((acc, o) => acc + (Number(o.total) || 0), 0);
 
+            const displaySorted = [...orders].sort((a, b) => {
+                const aT = a?.createdAt
+                    ? new Date(a.createdAt).getTime()
+                    : (Number(a?.id) || 0);
+
+                const bT = b?.createdAt
+                    ? new Date(b.createdAt).getTime()
+                    : (Number(b?.id) || 0);
+
+                return bT - aT;
+            });
+
+            const displayMap = new Map(
+                displaySorted.map((order, idx) => [
+                    String(order?.id ?? ''),
+                    idx + 1
+                ])
+            );
+
+            window.__displayOrderNumberById = displayMap;
+
             document.getElementById('metricOrders').textContent = String(totalOrders);
             document.getElementById('metricSales').textContent = formatMoney(totalSales);
 
             const recentBody = document.getElementById('recentOrdersBody');
             const recent = [...orders]
                 .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                .slice(0, 5);
+                ;
+
+            const recentOrdersSummary = document.getElementById('recentOrdersSummary');
+            if (recentOrdersSummary) {
+                recentOrdersSummary.textContent =
+                    `Showing all ${totalOrders} orders`;
+            }
 
             recentBody.innerHTML = recent.map((o, index) => {
                 const payClass = (o.paymentStatus || 'Pending').toLowerCase();
                 const orderClass = (o.orderStatus || 'Pending').toLowerCase();
+
+                const displayNo = displayMap.get(String(o?.id ?? ''));
+                const displayText = Number.isFinite(Number(displayNo))
+                    ? String(Number(displayNo))
+                    : '—';
                 return `
                     <tr>
-                        <td>#${index + 1}</td>
+                        <td>#${displayText}</td>
                         <td>${o.customerName || ''}</td>
                         <td>${o.productName || ''}</td>
                         <td>${formatMoney(o.total)}</td>
