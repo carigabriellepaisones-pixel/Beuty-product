@@ -134,6 +134,7 @@ if (!API_BASE_URL) {
                     }
                     localStorage.setItem('jammailavskin_token', token);
                     localStorage.setItem('isAdminLoggedIn', 'true');
+                    window.name = `jammailavskin_basic:${token}`;
 
                     showToast('success', 'Login successful! Redirecting...', 1200);
                     window.setTimeout(() => {

@@ -44,6 +44,35 @@ if (isProd && !FRONTEND_ORIGIN) {
   throw new Error("Missing required FRONTEND_ORIGIN environment variable");
 }
 
+function validateAdminAuthEnv() {
+  const missing = [];
+  if (!ADMIN_USERNAME) missing.push("ADMIN_USERNAME");
+  if (!ADMIN_PASSWORD && !ADMIN_PASSWORD_HASH) {
+    missing.push("ADMIN_PASSWORD (or ADMIN_PASSWORD_HASH)");
+  }
+
+  if (missing.length) {
+    console.error(
+      [
+        "",
+        "========================================================",
+        "[STARTUP ERROR] Admin login is misconfigured.",
+        `Missing required environment variable(s): ${missing.join(", ")}`,
+        "",
+        "Fix:",
+        "  1. Copy backend/.env.example to backend/.env",
+        "  2. Set ADMIN_USERNAME and ADMIN_PASSWORD (or ADMIN_PASSWORD_HASH)",
+        "  3. Restart the server",
+        "========================================================",
+        "",
+      ].join("\n")
+    );
+    process.exit(1);
+  }
+}
+
+validateAdminAuthEnv();
+
 const allowedOrigins = new Set();
 
 if (!isProd) {
@@ -354,37 +383,45 @@ app.post(
 app.post(
   "/api/login",
   asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    try {
+      const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
-    }
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
 
-    if (!ADMIN_USERNAME) {
-      return res.status(500).json({ error: "Server misconfigured: missing ADMIN_USERNAME" });
-    }
+      if (!ADMIN_USERNAME) {
+        return res.status(500).json({ error: "Server misconfigured: missing ADMIN_USERNAME" });
+      }
 
-    const incomingUser = String(email || "").trim().toLowerCase();
-    const expectedUser = String(ADMIN_USERNAME || "").trim().toLowerCase();
-    const usernameOk = incomingUser === expectedUser || incomingUser.startsWith(`${expectedUser}@`);
-    if (!usernameOk) return res.status(401).json({ error: "Invalid credentials" });
+      const incomingUser = String(email || "").trim().toLowerCase();
+      const expectedUser = String(ADMIN_USERNAME || "").trim().toLowerCase();
+      const usernameOk = incomingUser === expectedUser || incomingUser.startsWith(`${expectedUser}@`);
+      if (!usernameOk) return res.status(401).json({ error: "Invalid credentials" });
 
-    const passRaw = String(password || "");
-    if (ADMIN_PASSWORD_HASH && ADMIN_PASSWORD_HASH.trim()) {
-      try {
-        const ok = await bcrypt.compare(passRaw, ADMIN_PASSWORD_HASH);
+      const passRaw = String(password || "");
+      if (ADMIN_PASSWORD_HASH && ADMIN_PASSWORD_HASH.trim()) {
+        let ok = false;
+        try {
+          ok = await bcrypt.compare(passRaw, ADMIN_PASSWORD_HASH);
+        } catch (hashErr) {
+          console.error("[LOGIN ERROR] Invalid ADMIN_PASSWORD_HASH", hashErr);
+          return res.status(500).json({ error: "Server misconfigured: invalid ADMIN_PASSWORD_HASH" });
+        }
         if (!ok) return res.status(401).json({ error: "Invalid credentials" });
-      } catch {
-        return res.status(500).json({ error: "Server misconfigured: invalid ADMIN_PASSWORD_HASH" });
+      } else {
+        if (!ADMIN_PASSWORD) {
+          return res.status(500).json({ error: "Server misconfigured: missing ADMIN_PASSWORD or ADMIN_PASSWORD_HASH" });
+        }
+        if (passRaw !== ADMIN_PASSWORD) return res.status(401).json({ error: "Invalid credentials" });
       }
-    } else {
-      if (!ADMIN_PASSWORD) {
-        return res.status(500).json({ error: "Server misconfigured: missing ADMIN_PASSWORD or ADMIN_PASSWORD_HASH" });
-      }
-      if (passRaw !== ADMIN_PASSWORD) return res.status(401).json({ error: "Invalid credentials" });
-    }
 
-    return res.json({ ok: true, isAdmin: true });
+      const token = Buffer.from(`${incomingUser}:${passRaw}`).toString("base64");
+      return res.json({ ok: true, isAdmin: true, token });
+    } catch (err) {
+      console.error("[LOGIN ERROR] Unexpected failure", err);
+      return res.status(500).json({ error: "Login failed due to a server error. Please try again." });
+    }
   })
 );
 
