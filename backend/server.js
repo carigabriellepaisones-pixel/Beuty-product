@@ -1405,6 +1405,11 @@ app.use((err, req, res, next) => {
   return res.status(statusCode).json({ message: String(err.message || "Request failed") });
 });
 
+app.get("/", (req, res) => {
+  res.send("Backend API is running!");
+});
+
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);
 });
+
