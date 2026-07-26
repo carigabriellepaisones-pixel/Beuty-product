@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JammailaV-skin Admin | Dashboard</title>
+    <link rel="icon" href="data:,">
+    <style>
+        :root {
+            --bg: #f7f7f4;
+            --panel: #ffffff;
+            --mutedPanel: #fbfbf8;
+            --text: #2b2b2b;
+            --muted: #6b6b6b;
+            --primary: #2f7f6b;
+            --primaryDeep: #256a59;
+            --accent: #c6a15b;
+            --border: rgba(0,0,0,0.08);
+            --shadow: 0 12px 30px rgba(0,0,0,0.08);
+            --shadowSoft: 0 8px 20px rgba(0,0,0,0.06);
+            --radius: 18px;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: radial-gradient(1200px 800px at 10% 0%, rgba(198,161,91,0.16) 0%, rgba(198,161,91,0) 60%),
+                        radial-gradient(900px 600px at 100% 10%, rgba(47,127,107,0.12) 0%, rgba(47,127,107,0) 55%),
+                        var(--bg);
+            color: var(--text);
+        }
+
+        .app {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 1.25rem;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0.85rem;
+            border-radius: 14px;
+            background: var(--panel);
+            box-shadow: var(--shadowSoft);
+        }
+
+        .brand-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #ffd0df, #ffe8f0);
+            border: 1px solid var(--border);
+            font-weight: 800;
+            color: var(--primaryDeep);
+            letter-spacing: 0.5px;
+        }
+
+        .brand-title { margin: 0; font-size: 1rem; letter-spacing: 0.6px; }
+        .brand-sub { margin: 0.25rem 0 0; font-size: 0.8rem; color: var(--muted); }
+
+        .nav {
+            margin-top: 1rem;
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .nav button {
+            width: 100%;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 0.8rem 0.9rem;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.8rem;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .nav button:hover {
+            background: rgba(255,255,255,0.7);
+            border-color: var(--border);
+        }
+
+        .nav button.active {
+            background: linear-gradient(135deg, rgba(243,154,181,0.18), rgba(255,232,240,0.7));
+            border-color: rgba(243,154,181,0.35);
+        }
+
+        .icon {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+        }
+
+        .content {
+            padding: 1.25rem;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            background: var(--panel);
+            box-shadow: var(--shadowSoft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem 1.1rem;
+        }
+
+        .topbar h1 { margin: 0; font-size: 1.2rem; }
+        .topbar p { margin: 0.2rem 0 0; color: var(--muted); font-size: 0.9rem; }
+
+        .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+        .menuBtn {
+            display: none;
+            border: 1px solid var(--border);
+            background: var(--mutedPanel);
+            border-radius: 12px;
+            padding: 0.55rem 0.7rem;
+            cursor: pointer;
+        }
+
+        .grid {
+            margin-top: 1.25rem;
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadowSoft);
+            border-radius: var(--radius);
+            padding: 1.1rem 1.1rem;
+        }
+
+        .cardTitle { margin: 0; font-size: 0.95rem; color: var(--muted); }
+        .cardValue { margin: 0.5rem 0 0; font-size: 1.65rem; font-weight: 800; letter-spacing: 0.2px; }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border);
+            background: #fff;
+        }
+
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+
+        .sectionHeader {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .sectionHeader h2 { margin: 0; font-size: 1.05rem; }
+        .sectionHeader .hint { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.9rem; }
+
+        .panel {
+            margin-top: 1rem;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadowSoft);
+            border-radius: var(--radius);
+            padding: 1.1rem;
+        }
+
+        #section-orders .panel {
+            overflow: visible;
+        }
+
+        .form {
+            display: grid;
+            grid-template-columns: 1.2fr 0.6fr 0.6fr;
+            gap: 0.75rem;
+            align-items: end;
+        }
+
+        label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.35rem; }
+        input {
+            width: 100%;
+            padding: 0.7rem 0.8rem;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            outline: none;
+            background: #fff;
+        }
+        input:focus {
+            border-color: rgba(47,127,107,0.55);
+            box-shadow: 0 0 0 4px rgba(47,127,107,0.14);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.7rem 0.8rem;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            outline: none;
+            background: #fff;
+            resize: vertical;
+            font-family: inherit;
+        }
+        textarea:focus {
+            border-color: rgba(47,127,107,0.55);
+            box-shadow: 0 0 0 4px rgba(47,127,107,0.14);
+        }
+
+        @media print {
+            @page {
+                size: auto;
+                margin: 8mm;
+            }
+            body.is-printing-invoice > *:not(#invoicePrintModal) {
+                display: none !important;
+            }
+            #invoicePrintModal {
+                position: static !important;
+                inset: auto !important;
+                display: block !important;
+                background: #fff !important;
+            }
+            #invoicePrintModal [data-close="true"] {
+                display: none !important;
+            }
+            #invoicePrintModal [data-close="true"],
+            #invoicePrintModal .btn {
+                display: none !important;
+            }
+            #invoicePrintModal .invoiceCard {
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+            }
+            #invoicePrintModal #invoicePrintBody {
+                padding: 0 !important;
+                background: transparent !important;
+            }
+            #invoicePrintModal .compactReceipt {
+                width: 80mm !important;
+                border: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+            }
+            #invoicePrintModal .compactReceipt,
+            #invoicePrintModal .compactReceipt * {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            #invoicePrintModal .compactReceiptSection,
+            #invoicePrintModal .compactReceiptTable {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            #invoicePrintModal * {
+                box-shadow: none !important;
+                text-shadow: none !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        .compactReceiptWrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .compactReceipt {
+            width: min(420px, 100%);
+            background: #fff;
+            color: #111;
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 12px;
+            padding: 12px 12px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .compactReceiptHeader {
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed rgba(0,0,0,0.25);
+        }
+
+        .compactReceiptTitle {
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            margin: 0;
+        }
+
+        .compactReceiptSub {
+            margin: 4px 0 0;
+            font-size: 11px;
+            opacity: 0.75;
+        }
+
+        .compactReceiptMeta {
+            margin-top: 10px;
+            display: grid;
+            gap: 4px;
+            font-size: 11px;
+        }
+
+        .compactReceiptRow {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .compactReceiptRow .label {
+            opacity: 0.75;
+            white-space: nowrap;
+        }
+
+        .compactReceiptRow .value {
+            font-weight: 800;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .compactReceiptSection {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(0,0,0,0.25);
+        }
+
+        .compactReceiptSectionTitle {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin: 0 0 6px;
+            opacity: 0.85;
+        }
+
+        .compactReceiptText {
+            font-size: 11px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .compactReceiptTable {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 11px;
+        }
+
+        .compactReceiptTable th {
+            text-align: left;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.15);
+            opacity: 0.8;
+            font-weight: 900;
+        }
+
+        .compactReceiptTable td {
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.15);
+            vertical-align: top;
+        }
+
+        .compactReceiptTable .num {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .compactReceiptTotals {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(0,0,0,0.20);
+            display: grid;
+            gap: 4px;
+            font-size: 11px;
+        }
+
+        .compactReceiptGrand {
+            margin-top: 6px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(0,0,0,0.25);
+            font-weight: 900;
+            font-size: 13px;
+        }
+
+        .btn {
+            border: 1px solid transparent;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            padding: 0.7rem 0.9rem;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 12px 20px rgba(47,127,107,0.18);
+        }
+        .btn:hover { background: var(--primaryDeep); }
+        .btn.secondary {
+            background: #fff;
+            color: var(--text);
+            border-color: var(--border);
+            box-shadow: none;
+        }
+        .btn.danger {
+            background: #ff5b7b;
+            box-shadow: 0 12px 20px rgba(255,91,123,0.18);
+        }
+
+        .btn.small {
+            padding: 0.55rem 0.75rem;
+            border-radius: 12px;
+            box-shadow: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.55rem 0.7rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #fff;
+            outline: none;
+            font-weight: 700;
+            color: var(--text);
+        }
+        select:focus {
+            border-color: rgba(47,127,107,0.55);
+            box-shadow: 0 0 0 4px rgba(47,127,107,0.14);
+        }
+
+        .productsLayout {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.9rem;
+        }
+
+        .add-product-card {
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .inventoryGrid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+
+        .inventoryList {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .invItem {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--panel);
+            overflow: hidden;
+            box-shadow: var(--shadowSoft);
+        }
+
+        .invHeader {
+            width: 100%;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 12px;
+            cursor: pointer;
+        }
+
+        .invTitle {
+            font-weight: 900;
+            font-size: 0.95rem;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .invRight {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            justify-self: end;
+        }
+
+        .invBadge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border: 1px solid rgba(0,0,0,0.10);
+            background: rgba(0,0,0,0.04);
+        }
+
+        .invLayerHeader {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin: 0 0 0.45rem;
+        }
+
+        .invLayerCount {
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .invTableWrap {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .invTableScroll {
+            overflow-x: auto;
+        }
+
+        .invTable {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 640px;
+        }
+
+        .invTable thead th {
+            background: #f9fafb;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: left;
+            padding: 12px 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .invTable tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+
+        .invTable tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .invTdRight {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .invPrice {
+            font-weight: 700;
+        }
+
+        .invProdCell {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .invProdName {
+            font-weight: 700;
+        }
+
+        .invRowActions {
+            display: inline-flex;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .invBadge--individual {
+            background: rgba(47,127,107,0.10);
+            border-color: rgba(47,127,107,0.22);
+            color: var(--primaryDeep);
+        }
+
+        .invBadge--set {
+            background: rgba(198,161,91,0.12);
+            border-color: rgba(198,161,91,0.26);
+            color: #6b5429;
+        }
+
+        .invBadge--package {
+            background: rgba(95, 110, 255, 0.12);
+            border-color: rgba(95, 110, 255, 0.26);
+            color: #2b2f6b;
+        }
+
+        .invMeta {
+            font-weight: 800;
+            font-size: 0.86rem;
+            color: rgba(15, 23, 42, 0.75);
+        }
+
+        .invDrawer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 220ms ease;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            background: rgba(0,0,0,0.02);
+        }
+
+        .invItem.is-expanded .invDrawer {
+            max-height: 520px;
+        }
+
+        .invDrawerInner {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 12px;
+            padding: 12px 12px;
+        }
+
+        .invThumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid rgba(0,0,0,0.10);
+            background: white;
+        }
+
+        .invDetails {
+            display: grid;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .invText {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.35;
+        }
+
+        .invActions {
+            display: inline-flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .productCard {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadowSoft);
+            display: grid;
+            grid-template-rows: 170px auto;
+        }
+
+        .productImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: linear-gradient(135deg, rgba(0,0,0,0.04), rgba(0,0,0,0));
+        }
+
+        .productBody {
+            padding: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            min-height: 0;
+        }
+
+        .productName {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+
+        .productMeta {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.25;
+            display: -webkit-box;
+            line-clamp: 3;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .productActions {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .productActions .btn {
+            width: 75px;
+            height: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .dropzone {
+            border: 2px dashed rgba(0,0,0,0.16);
+            border-radius: 16px;
+            background: var(--mutedPanel);
+            padding: 0.85rem;
+            cursor: pointer;
+            display: grid;
+            gap: 0.35rem;
+            place-items: center;
+            text-align: center;
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+        .dropzone:hover {
+            border-color: rgba(47,127,107,0.55);
+            background: rgba(47,127,107,0.05);
+        }
+        .dropzone.isDragOver {
+            border-color: rgba(198,161,91,0.8);
+            background: rgba(198,161,91,0.10);
+        }
+        .dropzoneIcon {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: rgba(47,127,107,0.10);
+            border: 1px solid rgba(47,127,107,0.20);
+            color: var(--primaryDeep);
+        }
+        .dropzoneTitle {
+            font-weight: 800;
+        }
+        .dropzoneSub {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .imagePreview {
+            display: none;
+            margin-top: 0.55rem;
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #fff;
+            align-items: center;
+            gap: 0.65rem;
+        }
+        .imagePreview.show {
+            display: flex;
+        }
+        .imagePreview img {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            aspect-ratio: 1 / 1;
+        }
+        .imagePreview strong {
+            display: block;
+            font-size: 0.92rem;
+        }
+        .imagePreview span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-top: 0.1rem;
+        }
+
+        .tableWrap { overflow-x: hidden; overflow-y: visible; border-radius: 14px; border: 1px solid var(--border); width: 100%; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        thead th {
+            position: sticky;
+            top: 0;
+            background: var(--mutedPanel);
+            text-align: left;
+            padding: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        tbody td {
+            padding: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        tbody tr:hover { background: #fff7fa; }
+
+        .orderStatusSelect {
+            width: 100%;
+            max-width: 170px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.10);
+            background: #fff;
+            font-weight: 800;
+            font-size: 0.88rem;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            line-height: 1.1;
+        }
+
+        .orderMetaInput,
+        .orderMetaSelect {
+            width: 100%;
+            max-width: 170px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.10);
+            background: #fff;
+            font-weight: 700;
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        .orderStatusSelect.pending { color: #8a5a14; background: rgba(255, 215, 150, 0.32); border-color: rgba(255, 183, 77, 0.40); }
+        .orderStatusSelect.verified,
+        .orderStatusSelect.processing,
+        .orderStatusSelect.shipped,
+        .orderStatusSelect.delivered { color: #146b3a; background: rgba(170, 243, 198, 0.35); border-color: rgba(39,174,96,0.28); }
+
+        .orderStatusSelect.failed,
+        .orderStatusSelect.cancelled { color: #7a1b1b; background: rgba(255, 182, 182, 0.35); border-color: rgba(231, 76, 60, 0.28); }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            background: #fff;
+        }
+        .status.pending { color: #c06b85; background: rgba(243,154,181,0.12); border-color: rgba(243,154,181,0.25); }
+        .status.shipped { color: #1f9d68; background: rgba(39,174,96,0.12); border-color: rgba(39,174,96,0.25); }
+
+        .status.delivered { color: #5b6cff; background: rgba(91,108,255,0.12); border-color: rgba(91,108,255,0.22); }
+
+        .pay {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border: 1px solid var(--border);
+            background: #fff;
+            white-space: nowrap;
+        }
+        .pay.pending { color: #d9822b; background: rgba(217,130,43,0.12); border-color: rgba(217,130,43,0.22); }
+        .pay.paid { color: #2f80ed; background: rgba(47,128,237,0.12); border-color: rgba(47,128,237,0.22); }
+        .pay.verified { color: #27ae60; background: rgba(39,174,96,0.12); border-color: rgba(39,174,96,0.22); }
+
+        .table-responsive-container {
+            width: 100%;
+            overflow-x: hidden;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 16px;
+        }
+
+        .table-responsive-container table th,
+        .table-responsive-container table td {
+            padding: 12px 14px;
+            vertical-align: top;
+        }
+
+        .table-responsive-container table td {
+            line-height: 1.35;
+        }
+
+        .ordersColAddress,
+        .ordersColProducts {
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .ordersColQty,
+        .ordersColTotal,
+        .ordersColPayment {
+            white-space: nowrap;
+        }
+
+        .orderActions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn.tiny {
+            padding: 7px 10px;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            line-height: 1.1;
+            min-height: 34px;
+            white-space: nowrap;
+        }
+
+        .btn.success {
+            background: #0f766e;
+            border-color: rgba(15,118,110,0.35);
+            color: #fff;
+        }
+
+        .btn.success:hover {
+            background: #0d615a;
+        }
+
+        .btn.danger {
+            background: rgba(239,68,68,0.10);
+            color: #b91c1c;
+            border-color: rgba(239,68,68,0.35);
+        }
+
+        .btn.danger:hover {
+            background: rgba(239,68,68,0.16);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        #section-orders .table-responsive-container table.orders-dashboard-table {
+            width: 100%;
+        }
+
+        #section-orders table.orders-dashboard-table th,
+        #section-orders table.orders-dashboard-table td {
+            overflow: visible;
+            text-overflow: clip;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColActions,
+        #section-orders table.orders-dashboard-table td.ordersColActions {
+            width: 160px;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColCustomer,
+        #section-orders table.orders-dashboard-table td.ordersColCustomer {
+            width: 130px;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColQty,
+        #section-orders table.orders-dashboard-table td.ordersColQty {
+            width: 56px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .app { grid-template-columns: 1fr; }
+            .sidebar { position: fixed; inset: 0; height: 100vh; width: 280px; z-index: 999; display: none; }
+            .sidebar.is-open { display: block; }
+            .menuBtn { display: block; }
+            .cards { grid-template-columns: 1fr; }
+            .inventoryGrid { grid-template-columns: 1fr; }
+            .form { grid-template-columns: 1fr; }
+            .table-responsive-container { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-badge">JV</div>
+                <div>
+                    <h3 class="brand-title">JammailaV</h3>
+                    <p class="brand-sub">Admin Panel</p>
+                </div>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-section="dashboard"><span class="icon">📊</span> Dashboard</button>
+                <button class="nav-btn" data-section="orders"><span class="icon">🧾</span> Orders</button>
+                <button class="nav-btn" data-section="products"><span class="icon">🧴</span> Products</button>
+                <button class="nav-btn" data-section="inventory"><span class="icon">📦</span> Inventory Product</button>
+                <button id="logoutBtn" style="margin-top:auto; color: #ff5b7b;"><span class="icon">🚪</span> Logout</button>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <button class="menuBtn" id="menuToggle">☰</button>
+
+            <div class="topbar">
+                <div class="topbar-left">
+                    <h1>JammailaV-skin Admin</h1>
+                    <p>Beauty Commerce</p>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="section-dashboard" class="section active">
+                <div class="sectionHeader">
+                    <div>
+                        <h2>Dashboard</h2>
+                        <p class="hint">Overview of your business</p>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="cards">
+                        <div class="card">
+                            <p class="cardTitle">Total Orders</p>
+                            <p class="cardValue" id="totalOrders">0</p>
+                        </div>
+                        <div class="card">
+                            <p class="cardTitle">Total Revenue</p>
+                            <p class="cardValue" id="totalRevenue">₱0</p>
+                        </div>
+                    </div>
+                    <div class="cards">
+                        <div class="card">
+                            <p class="cardTitle">Total Products</p>
+                            <p class="cardValue" id="totalProducts">0</p>
+                        </div>
+                        <div class="card">
+                            <p class="cardTitle">Out of Stock</p>
+                            <p class="cardValue" id="outOfStock">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Section -->
+            <div id="section-orders" class="section">
+                <div class="sectionHeader">
+                    <div>
+                        <h2>Orders</h2>
+                        <p class="hint">Manage customer orders</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="table-responsive-container">
+                        <table class="orders-dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th class="ordersColId">Order ID</th>
+                                    <th class="ordersColCustomer">Customer</th>
+                                    <th class="ordersColProducts">Products</th>
+                                    <th class="ordersColQty">Qty</th>
+                                    <th class="ordersColTotal">Total</th>
+                                    <th class="ordersColPayment">Payment</th>
+                                    <th class="ordersColStatus">Status</th>
+                                    <th class="ordersColActions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <div id="section-products" class="section">
+                <div class="sectionHeader">
+                    <div>
+                        <h2>Products</h2>
+                        <p class="hint">Add and manage products (Database Connected)</p>
+                    </div>
+                </div>
+
+                <div class="productsLayout">
+                    <div class="card add-product-card" style="padding: 1.05rem;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap: 0.75rem;">
+                            <div>
+                                <h3 style="margin:0; font-size: 1rem;">Add New Product</h3>
+                                <p style="margin:0.35rem 0 0; color: var(--muted); font-size: 0.9rem;">Fill in the details and upload a photo</p>
+                            </div>
+                            <span class="pill" style="border-color: rgba(198,161,91,0.38); background: rgba(198,161,91,0.10); color: #6b5429;">Inventory</span>
+                        </div>
+
+                        <div style="margin-top: 0.85rem;">
+                            <form id="addProductForm">
+                            <div class="form">
+                                <div>
+                                    <label>Product Name</label>
+                                    <input type="text" id="pName" placeholder="e.g., Serums" required>
+                                </div>
+                                <div>
+                                    <label>Product Layer</label>
+                                    <select id="pLayer">
+                                        <option value="1">Top Section (Layer 1)</option>
+                                        <option value="2">Bottom Section (Layer 2)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>Type</label>
+                                    <select id="pType">
+                                        <option value="SINGLE">Single Product</option>
+                                        <option value="BUNDLE">Bundle</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form">
+                                <div>
+                                    <label>Price</label>
+                                    <input type="number" id="pPrice" placeholder="190" step="0.01" required>
+                                </div>
+                                <div>
+                                    <label>Stock</label>
+                                    <input type="number" id="pStock" placeholder="190" min="0" required>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 0.75rem;">
+                                <label>Product Image</label>
+                                <div class="dropzone" id="pImageDropzone">
+                                    <div class="dropzoneIcon">📷</div>
+                                    <div>
+                                        <div class="dropzoneTitle">Drag & Drop or Click to Upload Image</div>
+                                        <div class="dropzoneSub">PNG, JPG up to 5MB</div>
+                                    </div>
+                                </div>
+                                <div class="imagePreview" id="pImagePreview">
+                                    <img id="pImagePreviewImg" alt="preview">
+                                    <div>
+                                        <strong id="pImagePreviewName"></strong>
+                                        <span id="pImagePreviewSize"></span>
+                                    </div>
+                                </div>
+                                <input type="file" id="pImage" accept="image/*" style="display:none;">
+                            </div>
+
+                            <div style="margin-top: 0.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; align-items: end;">
+                                <div>
+                                    <label>Product Description</label>
+                                    <textarea id="pDescription" placeholder="e.g., soap ni sha" style="resize: vertical; min-height: 80px;"></textarea>
+                                </div>
+                                <div>
+                                    <label>Usage Instructions</label>
+                                    <textarea id="pUsageInstructions" placeholder="e.g., basta" style="resize: vertical; min-height: 80px;"></textarea>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+                                <button type="submit" class="btn" style="flex: 1;">Add Product</button>
+                                <button type="button" class="btn secondary" id="clearProductsBtn" style="flex: 0.5;">Clear Products</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Section -->
+            <div id="section-inventory" class="section">
+                <div class="sectionHeader">
+                    <div>
+                        <h2>Inventory Product</h2>
+                        <p class="hint">View and manage product layers</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div id="inventoryContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="invoicePrintModal"></div>
+
+    <script src="config.js"></script>
+    <script>
+        (() => {
+            const API_BASE_URL = window.APP_CONFIG?.API_BASE_URL;
+            if (!API_BASE_URL) {
+                throw new Error('Missing API_BASE_URL in config.js');
+            }
+
+            function getBasicAuthHeader() {
+                const token = localStorage.getItem('jammailavskin_token');
+                if (!token) return null;
+                // Token is already in format "username:password" base64 encoded
+                return `Basic ${token}`;
+            }
+
+            function showAdminToast({ type = 'success', text = '' }) {
+                const alertContainer = document.createElement('div');
+                alertContainer.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'error' ? '#ffebee' : '#e8f5e9'};
+                    color: ${type === 'error' ? '#c62828' : '#1b5e20'};
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    z-index: 10000;
+                    font-weight: 600;
+                    font-size: 14px;
+                `;
+                alertContainer.textContent = text;
+                document.body.appendChild(alertContainer);
+                setTimeout(() => alertContainer.remove(), 3000);
+            }
+
+            function logout() {
+                localStorage.removeItem('jammailavskin_token');
+                localStorage.removeItem('isAdminLoggedIn');
+                window.location.href = 'login.html';
+            }
+
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+
+            // Redirect if not logged in
+            if (!localStorage.getItem('isAdminLoggedIn')) {
+                window.location.href = 'login.html';
+            }
+
+            // Nav button listeners
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    btn.classList.add('active');
+                    const sectionId = `section-${btn.dataset.section}`;
+                    document.getElementById(sectionId)?.classList.add('active');
+                    if (btn.dataset.section === 'products') {
+                        setTimeout(() => renderAll(), 100);
+                    }
+                    if (btn.dataset.section === 'inventory') {
+                        setTimeout(() => renderInventory(), 100);
+                    }
+                });
+            });
+
+            document.getElementById('menuToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('is-open');
+            });
+
+            // Products Management
+            let productsCache = [];
+            let ordersCache = [];
+            const inMemoryStore = {
+                storeProducts: [],
+                storeProductsLayer2: [],
+                storefrontLayerServerSyncV1: false,
+                orders: []
+            };
+
+            function getProducts() {
+                return Array.isArray(productsCache) ? productsCache : [];
+            }
+
+            function getOrders() {
+                return Array.isArray(ordersCache) ? ordersCache : [];
+            }
+
+            async function fetchProductsFromApi() {
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/products`);
+                    if (!res.ok) throw new Error(`Bad response: ${res.status}`);
+                    const products = await res.json();
+                    productsCache = Array.isArray(products) ? products : [];
+                    return productsCache;
+                } catch (err) {
+                    console.error('[admin] fetchProductsFromApi failed', err);
+                    return [];
+                }
+            }
+
+            async function fetchOrdersFromApi() {
+                try {
+                    const authHeader = getBasicAuthHeader();
+                    if (!authHeader) {
+                        console.warn('[admin] No auth header available');
+                        return [];
+                    }
+
+                    const res = await fetch(`${API_BASE_URL}/api/admin/orders`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': authHeader
+                        }
+                    });
+
+                    if (!res.ok) throw new Error(`Bad response: ${res.status}`);
+                    const orders = await res.json();
+                    ordersCache = Array.isArray(orders) ? orders : [];
+                    return ordersCache;
+                } catch (err) {
+                    console.error('[admin] fetchOrdersFromApi failed', err);
+                    return [];
+                }
+            }
+
+            async function addProduct(e) {
+                e.preventDefault();
+
+                const name = document.getElementById('pName').value.trim();
+                const price = Number(document.getElementById('pPrice').value);
+                const stock = Number(document.getElementById('pStock').value);
+                const description = document.getElementById('pDescription').value.trim();
+                const usageInstructions = document.getElementById('pUsageInstructions').value.trim();
+                const type = document.getElementById('pType').value;
+                const storefrontLayer = Number(document.getElementById('pLayer').value);
+                const file = document.getElementById('pImage').files?.[0];
+
+                if (!name || !price) {
+                    showAdminToast({ type: 'error', text: 'Please fill in required fields.' });
+                    return;
+                }
+
+                try {
+                    const form = new FormData();
+                    form.append('name', name);
+                    form.append('price', String(price));
+                    form.append('stock', String(stock));
+                    form.append('description', description);
+                    form.append('usageInstructions', usageInstructions);
+                    form.append('type', type);
+                    form.append('storefrontLayer', String(storefrontLayer));
+                    if (file) form.append('image', file);
+
+                    const authHeader = getBasicAuthHeader();
+                    if (!authHeader) {
+                        showAdminToast({ type: 'error', text: 'Authentication required. Please log in again.' });
+                        return;
+                    }
+
+                    const res = await fetch(`${API_BASE_URL}/api/products`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': authHeader
+                        },
+                        body: form
+                    });
+
+                    let data = null;
+                    try {
+                        data = await res.json();
+                    } catch {
+                        // ignore
+                    }
+
+                    if (!res.ok) {
+                        console.error('Fetch Error:', { status: res.status, data });
+                        const message = data?.message || data?.error || 'Failed to add product.';
+                        showAdminToast({ type: 'error', text: String(message) });
+                        return;
+                    }
+
+                    productsCache = [data, ...productsCache];
+                    showAdminToast({ type: 'success', text: 'Product added successfully!' });
+
+                    // Reset form
+                    document.getElementById('addProductForm').reset();
+                    document.getElementById('pImagePreview').classList.remove('show');
+                    updateAddProductButtonState();
+
+                } catch (err) {
+                    console.error('[addProduct] Error:', err);
+                    showAdminToast({ type: 'error', text: 'Failed to add product.' });
+                }
+            }
+
+            function updateAddProductButtonState() {
+                const name = document.getElementById('pName').value.trim();
+                const price = document.getElementById('pPrice').value.trim();
+                const btn = document.querySelector('#addProductForm button[type="submit"]');
+                if (btn) {
+                    btn.disabled = !name || !price;
+                    btn.style.opacity = btn.disabled ? '0.5' : '1';
+                }
+            }
+
+            function bindDropzone({ dropzoneId, inputId, previewWrapId, imgId, nameId }) {
+                const dropzone = document.getElementById(dropzoneId);
+                const input = document.getElementById(inputId);
+                const previewWrap = document.getElementById(previewWrapId);
+                const img = document.getElementById(imgId);
+                const nameEl = document.getElementById(nameId);
+
+                if (!dropzone || !input) return;
+
+                dropzone.addEventListener('click', () => input.click());
+
+                dropzone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('isDragOver');
+                });
+
+                dropzone.addEventListener('dragleave', () => {
+                    dropzone.classList.remove('isDragOver');
+                });
+
+                dropzone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('isDragOver');
+                    const files = e.dataTransfer.files;
+                    if (files.length) input.files = files;
+                    input.dispatchEvent(new Event('change'));
+                });
+
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        img.src = evt.target.result;
+                        nameEl.textContent = file.name;
+                        document.getElementById('pImagePreviewSize').textContent = `${(file.size / 1024).toFixed(1)} KB`;
+                        previewWrap.classList.add('show');
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            function renderAll() {
+                fetchProductsFromApi().then(() => {
+                    renderProducts();
+                });
+            }
+
+            function renderProducts() {
+                // Products render implementation
+            }
+
+            function renderInventory() {
+                // Inventory render implementation
+            }
+// Initialize
+            if (typeof renderAll === 'function') {
+                renderAll();
+            } else if (typeof renderProducts === 'function') {
+                renderProducts();
+            }
+
+            if (typeof renderInventory === 'function') {
+                renderInventory();
+            }
+
+            bindDropzone({
+                dropzoneId: 'pImageDropzone',
+                inputId: 'pImage',
+                previewWrapId: 'pImagePreview',
+                imgId: 'pImagePreviewImg',
+                nameId: 'pImagePreviewName'
+            });
+
+            document.getElementById('addProductForm')?.addEventListener('submit', addProduct);
+            document.getElementById('pName')?.addEventListener('input', updateAddProductButtonState);
+            document.getElementById('pPrice')?.addEventListener('input', updateAddProductButtonState);
+            
+            if (typeof updateAddProductButtonState === 'function') {
+                updateAddProductButtonState();
+            }
+
+            document.getElementById('datePill')?.textContent = new Date().toLocaleDateString(undefined, { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        })();
+    </script>
+</body>
+</html>
