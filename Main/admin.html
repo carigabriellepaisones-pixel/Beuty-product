@@ -1478,12 +1478,7 @@
             } else if (typeof renderProducts === 'function') {
                 renderProducts();
             }
-
-            if (typeof renderInventory === 'function') {
-                renderInventory();
-            }
-
-            bindDropzone({
+bindDropzone({
                 dropzoneId: 'pImageDropzone',
                 inputId: 'pImage',
                 previewWrapId: 'pImagePreview',
@@ -1499,13 +1494,28 @@
                 updateAddProductButtonState();
             }
 
-        document.getElementById('datePill')?.textContent = new Date().toLocaleDateString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-}); 
+            const datePill = document.getElementById('datePill');
+            if (datePill) {
+                datePill.textContent = new Date().toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
         })();
+
+        // Safely creates or retrieves the receipt modal element
+        function ensureReceiptModal() {
+            let modal = document.getElementById('receiptModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'receiptModal';
+                modal.className = 'modal';
+                document.body.appendChild(modal);
+            }
+            return modal;
+        }
     </script>
 </body>
 </html>
