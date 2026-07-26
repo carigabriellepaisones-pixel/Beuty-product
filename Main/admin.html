@@ -1472,8 +1472,17 @@
             function renderInventory() {
                 // Inventory render implementation
             }
+// Initialize
+            if (typeof renderAll === 'function') {
+                renderAll();
+            } else if (typeof renderProducts === 'function') {
+                renderProducts();
+            }
 
-            // Initialize
+            if (typeof renderInventory === 'function') {
+                renderInventory();
+            }
+
             bindDropzone({
                 dropzoneId: 'pImageDropzone',
                 inputId: 'pImage',
@@ -1482,13 +1491,20 @@
                 nameId: 'pImagePreviewName'
             });
 
-            document.getElementById('addProductForm').addEventListener('submit', addProduct);
+            document.getElementById('addProductForm')?.addEventListener('submit', addProduct);
             document.getElementById('pName')?.addEventListener('input', updateAddProductButtonState);
             document.getElementById('pPrice')?.addEventListener('input', updateAddProductButtonState);
-            updateAddProductButtonState();
+            
+            if (typeof updateAddProductButtonState === 'function') {
+                updateAddProductButtonState();
+            }
 
-            document.getElementById('datePill').textContent = new Date().toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-
+            document.getElementById('datePill')?.textContent = new Date().toLocaleDateString(undefined, { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
         })();
     </script>
 </body>
