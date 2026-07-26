@@ -1499,12 +1499,12 @@
                 updateAddProductButtonState();
             }
 
-            document.getElementById('datePill')?.textContent = new Date().toLocaleDateString(undefined, { 
-                weekday: 'short', 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
-            });
+        document.getElementById('datePill')?.textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+}); 
         })();
     </script>
 </body>
