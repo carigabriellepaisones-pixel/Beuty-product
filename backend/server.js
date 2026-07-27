@@ -6,6 +6,8 @@ const { PrismaClient } = require("@prisma/client");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 require("dotenv").config();
 
@@ -184,7 +186,25 @@ fs.mkdirSync(receiptsDir, { recursive: true });
 app.use("/uploads", express.static(uploadsDir));
 app.use(express.json());
 
-const storage = multer.diskStorage({
+const CLOUDINARY_CLOUD_NAME = String(process.env.CLOUDINARY_CLOUD_NAME || "").trim();
+const CLOUDINARY_API_KEY = String(process.env.CLOUDINARY_API_KEY || "").trim();
+const CLOUDINARY_API_SECRET = String(process.env.CLOUDINARY_API_SECRET || "").trim();
+const useCloudinary = Boolean(CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET);
+
+if (useCloudinary) {
+  cloudinary.config({
+    cloud_name: CLOUDINARY_CLOUD_NAME,
+    api_key: CLOUDINARY_API_KEY,
+    api_secret: CLOUDINARY_API_SECRET,
+  });
+} else {
+  console.warn(
+    "[STARTUP WARNING] Cloudinary env vars (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) are missing. " +
+      "Falling back to local disk storage for uploads, which does NOT persist across redeploys on most hosts (e.g. Render)."
+  );
+}
+
+const diskStorageEngine = multer.diskStorage({
   destination: (req, file, cb) => {
     if (file && file.fieldname === "receipt") return cb(null, receiptsDir);
     return cb(null, uploadsDir);
@@ -204,6 +224,22 @@ const storage = multer.diskStorage({
   },
 });
 
+const cloudinaryStorageEngine = useCloudinary
+  ? new CloudinaryStorage({
+      cloudinary,
+      params: async (req, file) => {
+        const isReceipt = file && file.fieldname === "receipt";
+        return {
+          folder: isReceipt ? "jammailavskin/receipts" : "jammailavskin/products",
+          allowed_formats: ["jpg", "jpeg", "png", "webp"],
+          public_id: `${Date.now()}_${Math.random().toString(16).slice(2)}`,
+        };
+      },
+    })
+  : null;
+
+const storage = useCloudinary ? cloudinaryStorageEngine : diskStorageEngine;
+
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
@@ -220,6 +256,12 @@ const upload = multer({
   },
   limits: { fileSize: 5 * 1024 * 1024 },
 });
+
+function getUploadedFileUrl(file, kind) {
+  if (!file) return null;
+  if (useCloudinary) return file.path;
+  return kind === "receipt" ? `/uploads/receipts/${file.filename}` : `/uploads/${file.filename}`;
+}
 
 function asyncHandler(fn) {
   return function (req, res, next) {
@@ -484,7 +526,7 @@ app.post(
     const normalizedType = type === "BUNDLE" ? "BUNDLE" : "SINGLE";
     const normalizedIncludes = includes !== undefined && includes !== null ? String(includes).trim() : "";
 
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const imageUrl = getUploadedFileUrl(req.file, "product");
 
     const product = await withDbRetry(() =>
       prisma.product.create({
@@ -640,7 +682,7 @@ app.put(
     const normalizedIncludes = includes !== undefined && includes !== null ? String(includes).trim() : "";
 
     const nextImageUrl = req.file
-      ? `/uploads/${req.file.filename}`
+      ? getUploadedFileUrl(req.file, "product")
       : existingImageUrl
         ? String(existingImageUrl)
         : null;
@@ -710,7 +752,7 @@ app.post(
         ? Number(requestUserId)
         : 1;
 
-    const receiptImageUrl = req.file ? `/uploads/receipts/${req.file.filename}` : null;
+    const receiptImageUrl = getUploadedFileUrl(req.file, "receipt");
     const finalCustomerReceiptUrl =
       customerReceiptUrl !== undefined && customerReceiptUrl !== null && String(customerReceiptUrl).trim() !== ""
         ? String(customerReceiptUrl).trim()
