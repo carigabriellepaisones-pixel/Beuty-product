@@ -750,7 +750,7 @@ app.post(
       ? userIdParsed
       : Number.isFinite(requestUserId)
         ? Number(requestUserId)
-        : 1;
+        : null;
 
     const receiptImageUrl = getUploadedFileUrl(req.file, "receipt");
     const finalCustomerReceiptUrl =
@@ -837,7 +837,7 @@ app.post(
           if (profilePhone) userUpdate.phone = profilePhone;
           if (profileAddress) userUpdate.address = profileAddress;
 
-          if (Object.keys(userUpdate).length) {
+          if (Number.isFinite(finalUserId) && Object.keys(userUpdate).length) {
             try {
               await tx.user.update({
                 where: { id: parseInt(finalUserId, 10) },
@@ -914,7 +914,7 @@ app.post(
           const created = await tx.order.create({
             data: {
               status: "Pending",
-              userId: parseInt(finalUserId, 10),
+              userId: Number.isFinite(finalUserId) ? parseInt(finalUserId, 10) : null,
               customerName: orderCustomerName,
               phone: orderPhone,
               address: orderAddress,
@@ -996,8 +996,6 @@ app.post(
       return res.status(500).json({
         success: false,
         message: "Something went wrong, please try again!",
-        debugError: String(e?.message || e),
-        debugCode: e?.code || null,
       });
     }
 
@@ -1443,8 +1441,6 @@ app.use((err, req, res, next) => {
   if (statusCode === 500) {
     return res.status(500).json({
       message: isProd ? "Something went wrong, please try again!" : rawMessage,
-      debugError: rawMessage,
-      debugCode: err?.code || null,
     });
   }
 
