@@ -1213,8 +1213,9 @@
                                 <div>
                                     <label>Type</label>
                                     <select id="pType">
-                                        <option value="SINGLE">Single Product</option>
-                                        <option value="BUNDLE">Bundle</option>
+                                        <option value="SINGLE">Individual (Single Product)</option>
+                                        <option value="BUNDLE">Set (Bundle)</option>
+                                        <option value="PACKAGE">Package</option>
                                     </select>
                                 </div>
                             </div>
@@ -1899,8 +1900,9 @@
                                 <div>
                                     <label>Type</label>
                                     <select id="eType">
-                                        <option value="SINGLE">Single Product</option>
-                                        <option value="BUNDLE">Bundle</option>
+                                        <option value="SINGLE">Individual (Single Product)</option>
+                                        <option value="BUNDLE">Set (Bundle)</option>
+                                        <option value="PACKAGE">Package</option>
                                     </select>
                                 </div>
                             </div>
@@ -1960,7 +1962,7 @@
                 modal.querySelector('#eStock').value = product.stock ?? '';
                 modal.querySelector('#eDescription').value = product.description || '';
                 modal.querySelector('#eUsage').value = product.usageInstructions || '';
-                modal.querySelector('#eType').value = product.type === 'BUNDLE' ? 'BUNDLE' : 'SINGLE';
+                modal.querySelector('#eType').value = product.type === 'BUNDLE' ? 'BUNDLE' : product.type === 'PACKAGE' ? 'PACKAGE' : 'SINGLE';
                 modal.querySelector('#eLayer').value = String(product.storefrontLayer || 1);
                 modal.querySelector('#eImage').value = '';
 

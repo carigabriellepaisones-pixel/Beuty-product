@@ -523,7 +523,7 @@ app.post(
       return res.status(400).json({ error: "Invalid storefrontLayer (must be 1 or 2)" });
     }
 
-    const normalizedType = type === "BUNDLE" ? "BUNDLE" : "SINGLE";
+    const normalizedType = type === "BUNDLE" ? "BUNDLE" : type === "PACKAGE" ? "PACKAGE" : "SINGLE";
     const normalizedIncludes = includes !== undefined && includes !== null ? String(includes).trim() : "";
 
     const imageUrl = getUploadedFileUrl(req.file, "product");
@@ -538,7 +538,7 @@ app.post(
           description: description || null,
           usageInstructions: usageInstructions || null,
           type: normalizedType,
-          includes: normalizedType === "BUNDLE" && normalizedIncludes ? normalizedIncludes : null,
+          includes: (normalizedType === "BUNDLE" || normalizedType === "PACKAGE") && normalizedIncludes ? normalizedIncludes : null,
           storefrontLayer: layerParsed,
         },
       })
@@ -678,7 +678,7 @@ app.put(
       return res.status(400).json({ error: "Invalid storefrontLayer (must be 1 or 2)" });
     }
 
-    const normalizedType = type === "BUNDLE" ? "BUNDLE" : "SINGLE";
+    const normalizedType = type === "BUNDLE" ? "BUNDLE" : type === "PACKAGE" ? "PACKAGE" : "SINGLE";
     const normalizedIncludes = includes !== undefined && includes !== null ? String(includes).trim() : "";
 
     const nextImageUrl = req.file
@@ -699,7 +699,7 @@ app.put(
             description: description || null,
             usageInstructions: usageInstructions || null,
             type: normalizedType,
-            includes: normalizedType === "BUNDLE" && normalizedIncludes ? normalizedIncludes : null,
+            includes: (normalizedType === "BUNDLE" || normalizedType === "PACKAGE") && normalizedIncludes ? normalizedIncludes : null,
             ...(layerParsed === null ? null : { storefrontLayer: layerParsed }),
           },
         })
@@ -1104,7 +1104,7 @@ app.post(
       return res.status(400).json({ error: "name and price are required" });
     }
 
-    const normalizedType = type === "BUNDLE" ? "BUNDLE" : "SINGLE";
+    const normalizedType = type === "BUNDLE" ? "BUNDLE" : type === "PACKAGE" ? "PACKAGE" : "SINGLE";
     const normalizedIncludes = includes !== undefined && includes !== null ? String(includes).trim() : "";
 
     const product = await withDbRetry(() =>
@@ -1117,7 +1117,7 @@ app.post(
           description: description || null,
           usageInstructions: usageInstructions || null,
           type: normalizedType,
-          includes: normalizedType === "BUNDLE" && normalizedIncludes ? normalizedIncludes : null,
+          includes: (normalizedType === "BUNDLE" || normalizedType === "PACKAGE") && normalizedIncludes ? normalizedIncludes : null,
         },
       })
     );
