@@ -759,7 +759,7 @@ img {
 .productRail__track {
     display: flex !important;
     flex-wrap: nowrap !important;
-    gap: 24px;
+    gap: 16px;
     width: max-content;
     padding-right: 20px;
     align-items: stretch;
@@ -878,14 +878,14 @@ img {
     scroll-snap-align: start;
     background: rgba(255, 255, 255, 0.86);
     border: 1px solid rgba(16, 16, 16, 0.10);
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
-    width: 280px !important;
-    min-width: 280px !important;
-    max-width: 280px !important;
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
     flex-shrink: 0 !important;
     box-sizing: border-box;
     min-height: 100%;
@@ -906,22 +906,22 @@ img {
 
 .pBadge {
     position: absolute;
-    left: 12px;
-    top: 12px;
-    padding: 6px 10px;
+    left: 8px;
+    top: 8px;
+    padding: 4px 8px;
     border-radius: 999px;
     background: rgba(10, 35, 85, 0.92);
     color: rgba(255, 255, 255, 0.96);
-    font-size: 0.78rem;
+    font-size: 0.68rem;
     font-weight: 600;
 }
 
 .pHeart {
     position: absolute;
-    right: 12px;
-    top: 12px;
-    width: 38px;
-    height: 38px;
+    right: 8px;
+    top: 8px;
+    width: 30px;
+    height: 30px;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.55);
     background: rgba(0, 0, 0, 0.18);
@@ -935,14 +935,14 @@ img {
 }
 
 .pHeart svg {
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
 }
 
 .pCard__body {
-    padding: 12px 14px 12px;
+    padding: 8px 10px 8px;
     display: grid;
-    gap: 8px;
+    gap: 5px;
 }
 
 .pTag {
@@ -950,18 +950,18 @@ img {
     align-items: center;
     justify-content: center;
     width: fit-content;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border: 1px solid rgba(16, 16, 16, 0.86);
     border-radius: 4px;
-    font-size: 0.72rem;
+    font-size: 0.62rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
 }
 
 .pTitle {
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.86rem;
     font-weight: 600;
     letter-spacing: -0.01em;
     display: -webkit-box;
@@ -969,7 +969,7 @@ img {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: calc(1.55em * 2);
+    min-height: calc(1.3em * 2);
 }
 
 .pRating {
@@ -991,7 +991,7 @@ img {
 
 .pPrice {
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.86rem;
 }
 
 .pCta {
@@ -1000,9 +1000,10 @@ img {
     border-top: 1px solid rgba(16, 16, 16, 0.10);
     background: rgba(16, 16, 16, 0.96);
     color: rgba(255, 255, 255, 0.96);
-    padding: 14px 14px;
+    padding: 9px 10px;
+    font-size: 0.76rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     cursor: pointer;
 }
 
