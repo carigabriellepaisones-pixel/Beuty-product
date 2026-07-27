@@ -209,6 +209,17 @@
             align-items: end;
         }
 
+        .form--2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            align-items: end;
+        }
+
+        @media (max-width: 768px) {
+            .form--2col { grid-template-columns: 1fr; }
+        }
+
         label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.35rem; }
         input {
             width: 100%;
@@ -1208,14 +1219,14 @@
                                 </div>
                             </div>
 
-                            <div class="form">
+                            <div class="form--2col" style="margin-top: 0.75rem;">
                                 <div>
-                                    <label>Price</label>
-                                    <input type="number" id="pPrice" placeholder="190" step="0.01" required>
+                                    <label>Price (₱)</label>
+                                    <input type="number" id="pPrice" placeholder="0.00" step="0.01" min="0" required>
                                 </div>
                                 <div>
-                                    <label>Stock</label>
-                                    <input type="number" id="pStock" placeholder="190" min="0" required>
+                                    <label>Stock (units)</label>
+                                    <input type="number" id="pStock" placeholder="0" min="0" required>
                                 </div>
                             </div>
 
