@@ -1476,10 +1476,11 @@
                     .replaceAll("'", '&#39;');
             }
 
+            const NO_IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' font-size='13' text-anchor='middle' dy='.3em' fill='%23999'%3ENo Image%3C/text%3E%3C/svg%3E";
+
             function resolveImageUrl(imageUrl) {
-                const placeholder = 'https://via.placeholder.com/120x120?text=No+Image';
                 const raw = String(imageUrl || '').trim();
-                if (!raw) return placeholder;
+                if (!raw) return NO_IMAGE_PLACEHOLDER;
                 if (/^https?:\/\//i.test(raw)) return raw;
                 if (raw.startsWith('/uploads/')) return `${API_BASE_URL}${raw}`;
                 return raw;
@@ -1510,7 +1511,7 @@
                     <div class="inventoryList">
                         ${products.map((p) => `
                             <div class="card" style="display:flex; gap: 1rem; align-items:center; padding: 0.85rem;">
-                                <img src="${resolveImageUrl(p.imageUrl)}" alt="${escapeHtml(p.name)}" style="width:64px; height:64px; object-fit:cover; border-radius:10px; flex-shrink:0;" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120?text=No+Image';">
+                                <img class="inventoryImg" src="${resolveImageUrl(p.imageUrl)}" alt="${escapeHtml(p.name)}" style="width:64px; height:64px; object-fit:cover; border-radius:10px; flex-shrink:0;">
                                 <div style="flex:1; min-width:0;">
                                     <strong>${escapeHtml(p.name)}</strong>
                                     <div class="hint">₱${Number(p.price || 0).toFixed(2)} • Stock: ${Number(p.stock ?? 0)}</div>
@@ -1529,6 +1530,12 @@
                 });
                 container.querySelectorAll('.deleteProductBtn').forEach((btn) => {
                     btn.addEventListener('click', () => deleteProductFromInventory(Number(btn.dataset.id)));
+                });
+                container.querySelectorAll('.inventoryImg').forEach((img) => {
+                    img.addEventListener('error', function onImgError() {
+                        img.removeEventListener('error', onImgError);
+                        img.src = NO_IMAGE_PLACEHOLDER;
+                    });
                 });
             }
 
