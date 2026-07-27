@@ -918,13 +918,6 @@
             line-height: 1.35;
         }
 
-        .ordersColAddress,
-        .ordersColProducts {
-            white-space: normal;
-            word-break: break-word;
-            overflow-wrap: anywhere;
-        }
-
         .ordersColQty,
         .ordersColTotal,
         .ordersColPayment {
@@ -972,30 +965,75 @@
             background: transparent;
         }
 
+        #section-orders .table-responsive-container {
+            overflow-x: auto;
+        }
+
         #section-orders .table-responsive-container table.orders-dashboard-table {
             width: 100%;
+            min-width: 1180px;
+            table-layout: fixed;
         }
 
         #section-orders table.orders-dashboard-table th,
         #section-orders table.orders-dashboard-table td {
-            overflow: visible;
-            text-overflow: clip;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColId,
+        #section-orders table.orders-dashboard-table td.ordersColId {
+            width: 70px;
         }
 
         #section-orders table.orders-dashboard-table th.ordersColActions,
         #section-orders table.orders-dashboard-table td.ordersColActions {
-            width: 160px;
+            width: 100px;
         }
 
         #section-orders table.orders-dashboard-table th.ordersColCustomer,
         #section-orders table.orders-dashboard-table td.ordersColCustomer {
-            width: 130px;
+            width: 140px;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColAddress,
+        #section-orders table.orders-dashboard-table td.ordersColAddress {
+            width: 190px;
+            white-space: nowrap;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColProducts,
+        #section-orders table.orders-dashboard-table td.ordersColProducts {
+            width: 160px;
+            white-space: nowrap;
         }
 
         #section-orders table.orders-dashboard-table th.ordersColQty,
         #section-orders table.orders-dashboard-table td.ordersColQty {
-            width: 56px;
+            width: 50px;
             text-align: center;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColTotal,
+        #section-orders table.orders-dashboard-table td.ordersColTotal {
+            width: 100px;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColPayment,
+        #section-orders table.orders-dashboard-table td.ordersColPayment {
+            width: 110px;
+            white-space: nowrap;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColReceipt,
+        #section-orders table.orders-dashboard-table td.ordersColReceipt {
+            width: 70px;
+        }
+
+        #section-orders table.orders-dashboard-table th.ordersColStatus,
+        #section-orders table.orders-dashboard-table td.ordersColStatus {
+            width: 150px;
+            overflow: visible;
         }
 
         @media (max-width: 768px) {
@@ -1349,9 +1387,9 @@
                     return `
                         <tr>
                             <td class="ordersColId">#${o.id}</td>
-                            <td class="ordersColCustomer">${escapeHtml(o.customerName || '')}<br><span class="hint">${escapeHtml(o.phone || '')}</span></td>
-                            <td class="ordersColAddress">${escapeHtml(o.address || '')}</td>
-                            <td class="ordersColProducts">${productsLabel}</td>
+                            <td class="ordersColCustomer" title="${escapeHtml(o.customerName || '')}">${escapeHtml(o.customerName || '')}<br><span class="hint">${escapeHtml(o.phone || '')}</span></td>
+                            <td class="ordersColAddress" title="${escapeHtml(o.address || '')}">${escapeHtml(o.address || '')}</td>
+                            <td class="ordersColProducts" title="${escapeHtml(items.map((it) => it.productName || '').join(', '))}">${productsLabel}</td>
                             <td class="ordersColQty">${qty}</td>
                             <td class="ordersColTotal">₱${total.toFixed(2)}</td>
                             <td class="ordersColPayment">${escapeHtml(o.paymentMethod || '')}<br><span class="hint">${escapeHtml(o.paymentStatus || '')}</span></td>
