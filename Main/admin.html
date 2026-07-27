@@ -1353,6 +1353,9 @@
                     if (btn.dataset.section === 'orders') {
                         setTimeout(() => renderOrders(), 100);
                     }
+                    if (btn.dataset.section === 'dashboard') {
+                        setTimeout(() => renderDashboard(), 100);
+                    }
                 });
             });
 
@@ -1637,6 +1640,27 @@
                     console.error('[admin] fetchOrdersFromApi failed', err);
                     return [];
                 }
+            }
+
+            async function renderDashboard() {
+                await Promise.all([fetchOrdersFromApi(), fetchProductsFromApi()]);
+                const orders = getOrders();
+                const products = getProducts();
+
+                const totalOrders = orders.length;
+                const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total ?? o.total_amount ?? 0), 0);
+                const totalProducts = products.length;
+                const outOfStock = products.filter((p) => Number(p.stock ?? 0) === 0).length;
+
+                const totalOrdersEl = document.getElementById('totalOrders');
+                const totalRevenueEl = document.getElementById('totalRevenue');
+                const totalProductsEl = document.getElementById('totalProducts');
+                const outOfStockEl = document.getElementById('outOfStock');
+
+                if (totalOrdersEl) totalOrdersEl.textContent = String(totalOrders);
+                if (totalRevenueEl) totalRevenueEl.textContent = `\u20b1${totalRevenue.toFixed(2)}`;
+                if (totalProductsEl) totalProductsEl.textContent = String(totalProducts);
+                if (outOfStockEl) outOfStockEl.textContent = String(outOfStock);
             }
 
             async function addProduct(e) {
@@ -2064,6 +2088,9 @@
             }
             if (typeof renderInventory === 'function') {
                 renderInventory();
+            }
+            if (typeof renderDashboard === 'function') {
+                renderDashboard();
             }
 bindDropzone({
                 dropzoneId: 'pImageDropzone',
