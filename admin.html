@@ -966,12 +966,11 @@
         }
 
         #section-orders .table-responsive-container {
-            overflow-x: auto;
+            overflow-x: hidden;
         }
 
         #section-orders .table-responsive-container table.orders-dashboard-table {
             width: 100%;
-            min-width: 1180px;
             table-layout: fixed;
         }
 
@@ -988,23 +987,17 @@
 
         #section-orders table.orders-dashboard-table th.ordersColActions,
         #section-orders table.orders-dashboard-table td.ordersColActions {
-            width: 100px;
+            width: 150px;
         }
 
         #section-orders table.orders-dashboard-table th.ordersColCustomer,
         #section-orders table.orders-dashboard-table td.ordersColCustomer {
-            width: 140px;
-        }
-
-        #section-orders table.orders-dashboard-table th.ordersColAddress,
-        #section-orders table.orders-dashboard-table td.ordersColAddress {
-            width: 190px;
-            white-space: nowrap;
+            width: auto;
         }
 
         #section-orders table.orders-dashboard-table th.ordersColProducts,
         #section-orders table.orders-dashboard-table td.ordersColProducts {
-            width: 160px;
+            width: auto;
             white-space: nowrap;
         }
 
@@ -1125,7 +1118,6 @@
                                 <tr>
                                     <th class="ordersColId">Order ID</th>
                                     <th class="ordersColCustomer">Customer</th>
-                                    <th class="ordersColAddress">Address</th>
                                     <th class="ordersColProducts">Products</th>
                                     <th class="ordersColQty">Qty</th>
                                     <th class="ordersColTotal">Total</th>
@@ -1366,7 +1358,7 @@
                 const orders = getOrders();
 
                 if (!orders.length) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="hint" style="text-align:center; padding: 1.5rem;">No orders yet.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="hint" style="text-align:center; padding: 1.5rem;">No orders yet.</td></tr>';
                     return;
                 }
 
@@ -1388,7 +1380,6 @@
                         <tr>
                             <td class="ordersColId">#${o.id}</td>
                             <td class="ordersColCustomer" title="${escapeHtml(o.customerName || '')}">${escapeHtml(o.customerName || '')}<br><span class="hint">${escapeHtml(o.phone || '')}</span></td>
-                            <td class="ordersColAddress" title="${escapeHtml(o.address || '')}">${escapeHtml(o.address || '')}</td>
                             <td class="ordersColProducts" title="${escapeHtml(items.map((it) => it.productName || '').join(', '))}">${productsLabel}</td>
                             <td class="ordersColQty">${qty}</td>
                             <td class="ordersColTotal">₱${total.toFixed(2)}</td>
@@ -1400,7 +1391,10 @@
                                 </select>
                             </td>
                             <td class="ordersColActions">
-                                <button type="button" class="btn danger deleteOrderBtn" data-order-id="${o.id}" style="padding: 0.4rem 0.75rem;">Delete</button>
+                                <div style="display:flex; gap:6px;">
+                                    <button type="button" class="btn viewOrderBtn" data-order-id="${o.id}" style="padding: 0.4rem 0.75rem;">View</button>
+                                    <button type="button" class="btn danger deleteOrderBtn" data-order-id="${o.id}" style="padding: 0.4rem 0.75rem;">Delete</button>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -1412,6 +1406,73 @@
                 tbody.querySelectorAll('.deleteOrderBtn').forEach((btn) => {
                     btn.addEventListener('click', () => deleteOrder(Number(btn.dataset.orderId)));
                 });
+                tbody.querySelectorAll('.viewOrderBtn').forEach((btn) => {
+                    btn.addEventListener('click', () => openOrderDetailsModal(Number(btn.dataset.orderId)));
+                });
+            }
+
+            function ensureOrderDetailsModal() {
+                let modal = document.getElementById('orderDetailsModal');
+                if (modal) return modal;
+
+                modal = document.createElement('div');
+                modal.id = 'orderDetailsModal';
+                modal.style.cssText = `
+                    display:none; position:fixed; inset:0; z-index:10000;
+                    background: rgba(0,0,0,0.45); align-items:center; justify-content:center; padding: 1rem;
+                `;
+                modal.innerHTML = `
+                    <div class="card" style="width:100%; max-width:560px; max-height:90vh; overflow:auto; padding:1.25rem;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+                            <h3 style="margin:0;">Order Details</h3>
+                            <button type="button" class="btn secondary" id="orderDetailsCloseBtn" style="padding:0.35rem 0.75rem;">Close</button>
+                        </div>
+                        <div id="orderDetailsBody"></div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                const close = () => { modal.style.display = 'none'; };
+                modal.querySelector('#orderDetailsCloseBtn').addEventListener('click', close);
+                modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+
+                return modal;
+            }
+
+            function openOrderDetailsModal(orderId) {
+                const order = getOrders().find((o) => Number(o.id) === orderId);
+                if (!order) {
+                    showAdminToast({ type: 'error', text: 'Order not found.' });
+                    return;
+                }
+
+                const modal = ensureOrderDetailsModal();
+                const body = modal.querySelector('#orderDetailsBody');
+                const items = Array.isArray(order.items) ? order.items : [];
+                const total = Number(order.total ?? order.total_amount ?? 0);
+                const receiptUrl = order.customerReceiptUrl ? String(order.customerReceiptUrl) : '';
+
+                body.innerHTML = `
+                    <div style="display:grid; gap:0.6rem;">
+                        <div><strong>Order ID:</strong> #${order.id}</div>
+                        <div><strong>Customer:</strong> ${escapeHtml(order.customerName || '')}</div>
+                        <div><strong>Phone:</strong> ${escapeHtml(order.phone || '')}</div>
+                        <div><strong>Address:</strong> ${escapeHtml(order.address || '') || '<span class="hint">Not provided</span>'}</div>
+                        <div><strong>Products:</strong> ${items.map((it) => `${escapeHtml(it.productName || '')} x${it.quantity || 0}`).join(', ') || '-'}</div>
+                        <div><strong>Total:</strong> ₱${total.toFixed(2)}</div>
+                        <div><strong>Payment Method:</strong> ${escapeHtml(order.paymentMethod || '')}</div>
+                        <div><strong>Payment Status:</strong> ${escapeHtml(order.paymentStatus || '')}</div>
+                        <div><strong>Order Status:</strong> ${escapeHtml(order.orderStatus || '')}</div>
+                        <div>
+                            <strong>Receipt:</strong><br>
+                            ${receiptUrl
+                                ? `<a href="${escapeHtml(receiptUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(receiptUrl)}" alt="Receipt" style="max-width:100%; max-height:320px; border-radius:8px; border:1px solid #eee; margin-top:6px;" /></a>`
+                                : '<span class="hint">No receipt uploaded</span>'}
+                        </div>
+                    </div>
+                `;
+
+                modal.style.display = 'flex';
             }
 
             async function updateOrderStatus(orderId, newStatus, selectEl) {
