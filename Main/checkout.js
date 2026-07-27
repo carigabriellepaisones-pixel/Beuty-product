@@ -842,7 +842,7 @@ function initCheckout() {
                     let productsFetchError = null;
                     try {
                         const controller = new AbortController();
-                        const timeoutId = window.setTimeout(() => controller.abort(), 2500);
+                        const timeoutId = window.setTimeout(() => controller.abort(), 20000);
                         const pres = await fetch(`${API_BASE_URL}/api/products`, { signal: controller.signal });
                         window.clearTimeout(timeoutId);
                         productsFetchStatus = pres.status;
