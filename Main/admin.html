@@ -1400,6 +1400,8 @@
                     document.getElementById('pImagePreview').classList.remove('show');
                     updateAddProductButtonState();
 
+                    renderInventory();
+
                 } catch (err) {
                     console.error('[addProduct] Error:', err);
                     showAdminToast({ type: 'error', text: 'Failed to add product.' });
@@ -1465,18 +1467,67 @@
                 });
             }
 
+            function escapeHtml(value) {
+                return String(value || '')
+                    .replaceAll('&', '&amp;')
+                    .replaceAll('<', '&lt;')
+                    .replaceAll('>', '&gt;')
+                    .replaceAll('"', '&quot;')
+                    .replaceAll("'", '&#39;');
+            }
+
+            function resolveImageUrl(imageUrl) {
+                const placeholder = 'https://via.placeholder.com/120x120?text=No+Image';
+                const raw = String(imageUrl || '').trim();
+                if (!raw) return placeholder;
+                if (/^https?:\/\//i.test(raw)) return raw;
+                if (raw.startsWith('/uploads/')) return `${API_BASE_URL}${raw}`;
+                return raw;
+            }
+
             function renderProducts() {
-                // Products render implementation
+                // Products page only shows the Add Product form; no separate list here.
             }
 
             function renderInventory() {
-                // Inventory render implementation
+                fetchProductsFromApi().then(() => {
+                    renderInventoryList();
+                });
+            }
+
+            function renderInventoryList() {
+                const container = document.getElementById('inventoryContent');
+                if (!container) return;
+
+                const products = getProducts();
+
+                if (!products.length) {
+                    container.innerHTML = '<p class="hint">No products yet. Add a product to see it listed here.</p>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="inventoryList">
+                        ${products.map((p) => `
+                            <div class="card" style="display:flex; gap: 1rem; align-items:center; padding: 0.85rem;">
+                                <img src="${resolveImageUrl(p.imageUrl)}" alt="${escapeHtml(p.name)}" style="width:64px; height:64px; object-fit:cover; border-radius:10px; flex-shrink:0;">
+                                <div style="flex:1; min-width:0;">
+                                    <strong>${escapeHtml(p.name)}</strong>
+                                    <div class="hint">₱${Number(p.price || 0).toFixed(2)} • Stock: ${Number(p.stock ?? 0)}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
             }
 // Initialize
             if (typeof renderAll === 'function') {
                 renderAll();
             } else if (typeof renderProducts === 'function') {
                 renderProducts();
+            }
+            if (typeof renderInventory === 'function') {
+                renderInventory();
             }
 bindDropzone({
                 dropzoneId: 'pImageDropzone',
