@@ -1273,6 +1273,9 @@
                     if (btn.dataset.section === 'inventory') {
                         setTimeout(() => renderInventory(), 100);
                     }
+                    if (btn.dataset.section === 'orders') {
+                        setTimeout(() => renderOrders(), 100);
+                    }
                 });
             });
 
@@ -1308,6 +1311,109 @@
                 } catch (err) {
                     console.error('[admin] fetchProductsFromApi failed', err);
                     return [];
+                }
+            }
+
+            function renderOrders() {
+                fetchOrdersFromApi().then(() => {
+                    renderOrdersTable();
+                });
+            }
+
+            function renderOrdersTable() {
+                const tbody = document.getElementById('ordersTableBody');
+                if (!tbody) return;
+                const orders = getOrders();
+
+                if (!orders.length) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="hint" style="text-align:center; padding: 1.5rem;">No orders yet.</td></tr>';
+                    return;
+                }
+
+                const statusOptions = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+
+                tbody.innerHTML = orders.map((o) => {
+                    const items = Array.isArray(o.items) ? o.items : [];
+                    const productsLabel = items.map((it) => escapeHtml(it.productName || '')).join(', ') || '-';
+                    const qty = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+                    const total = Number(o.total ?? o.total_amount ?? 0);
+                    const currentStatus = String(o.orderStatus || 'Pending');
+                    const statusClass = currentStatus.toLowerCase();
+
+                    return `
+                        <tr>
+                            <td class="ordersColId">#${o.id}</td>
+                            <td class="ordersColCustomer">${escapeHtml(o.customerName || '')}<br><span class="hint">${escapeHtml(o.phone || '')}</span></td>
+                            <td class="ordersColProducts">${productsLabel}</td>
+                            <td class="ordersColQty">${qty}</td>
+                            <td class="ordersColTotal">₱${total.toFixed(2)}</td>
+                            <td class="ordersColPayment">${escapeHtml(o.paymentMethod || '')}<br><span class="hint">${escapeHtml(o.paymentStatus || '')}</span></td>
+                            <td class="ordersColStatus">
+                                <select class="orderStatusSelect ${statusClass}" data-order-id="${o.id}">
+                                    ${statusOptions.map((s) => `<option value="${s}" ${s.toLowerCase() === statusClass ? 'selected' : ''}>${s}</option>`).join('')}
+                                </select>
+                            </td>
+                            <td class="ordersColActions">
+                                <button type="button" class="btn danger deleteOrderBtn" data-order-id="${o.id}" style="padding: 0.4rem 0.75rem;">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                tbody.querySelectorAll('.orderStatusSelect').forEach((select) => {
+                    select.addEventListener('change', () => updateOrderStatus(Number(select.dataset.orderId), select.value, select));
+                });
+                tbody.querySelectorAll('.deleteOrderBtn').forEach((btn) => {
+                    btn.addEventListener('click', () => deleteOrder(Number(btn.dataset.orderId)));
+                });
+            }
+
+            async function updateOrderStatus(orderId, newStatus, selectEl) {
+                const authHeader = getBasicAuthHeader();
+                if (!authHeader) {
+                    showAdminToast({ type: 'error', text: 'Authentication required. Please log in again.' });
+                    return;
+                }
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/admin/orders/${orderId}/status`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': authHeader,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ orderStatus: newStatus }),
+                    });
+                    if (!res.ok) throw new Error(`Bad response: ${res.status}`);
+                    if (selectEl) {
+                        selectEl.className = `orderStatusSelect ${newStatus.toLowerCase()}`;
+                    }
+                    showAdminToast({ type: 'success', text: `Order #${orderId} status updated to ${newStatus}.` });
+                } catch (err) {
+                    console.error('[admin] updateOrderStatus failed', err);
+                    showAdminToast({ type: 'error', text: 'Failed to update order status.' });
+                }
+            }
+
+            async function deleteOrder(orderId) {
+                const ok = window.confirm(`Delete order #${orderId}? This cannot be undone.`);
+                if (!ok) return;
+
+                const authHeader = getBasicAuthHeader();
+                if (!authHeader) {
+                    showAdminToast({ type: 'error', text: 'Authentication required. Please log in again.' });
+                    return;
+                }
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/admin/orders/${orderId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': authHeader },
+                    });
+                    if (!res.ok) throw new Error(`Bad response: ${res.status}`);
+                    showAdminToast({ type: 'success', text: `Order #${orderId} deleted.` });
+                    renderOrders();
+                } catch (err) {
+                    console.error('[admin] deleteOrder failed', err);
+                    showAdminToast({ type: 'error', text: 'Failed to delete order.' });
                 }
             }
 
