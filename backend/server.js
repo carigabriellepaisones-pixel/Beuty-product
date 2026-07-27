@@ -996,6 +996,8 @@ app.post(
       return res.status(500).json({
         success: false,
         message: "Something went wrong, please try again!",
+        debugError: String(e?.message || e),
+        debugCode: e?.code || null,
       });
     }
 
