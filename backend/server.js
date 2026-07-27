@@ -1443,6 +1443,8 @@ app.use((err, req, res, next) => {
   if (statusCode === 500) {
     return res.status(500).json({
       message: isProd ? "Something went wrong, please try again!" : rawMessage,
+      debugError: rawMessage,
+      debugCode: err?.code || null,
     });
   }
 
