@@ -1024,6 +1024,45 @@
             overflow: visible;
         }
 
+        .odModalHeader {
+            display:flex; align-items:center; justify-content:space-between;
+            padding-bottom:0.9rem; margin-bottom:1rem; border-bottom:1px solid var(--border, #eee);
+        }
+        .odModalHeader h3 { margin:0; font-size:1.15rem; }
+        .odSection {
+            margin-bottom:1.1rem; padding-bottom:1.1rem; border-bottom:1px solid #f0f0f0;
+        }
+        .odSection:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+        .odSectionTitle {
+            font-size:0.72rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
+            color:#9a9a9a; margin-bottom:0.6rem;
+        }
+        .odGrid {
+            display:grid; grid-template-columns:1fr 1fr; gap:0.75rem 1rem;
+        }
+        .odField { min-width:0; }
+        .odLabel { font-size:0.74rem; color:#8a8a8a; margin-bottom:2px; }
+        .odValue { font-size:0.92rem; color:#222; font-weight:600; word-break:break-word; }
+        .odFull { grid-column: 1 / -1; }
+        .odProductsList { display:flex; flex-direction:column; gap:4px; }
+        .odProductRow {
+            display:flex; justify-content:space-between; font-size:0.9rem;
+            padding:6px 10px; background:#faf7f8; border-radius:8px;
+        }
+        .odTotalRow {
+            display:flex; justify-content:space-between; align-items:center;
+            padding-top:0.6rem; margin-top:0.3rem; border-top:1px dashed #eadfe2;
+        }
+        .odTotalRow .odLabel { font-size:0.85rem; }
+        .odTotalRow .odValue { font-size:1.05rem; color:#c2185b; }
+        .odReceiptBox {
+            display:flex; align-items:center; justify-content:center;
+            background:#faf7f8; border:1px dashed #e6dde0; border-radius:12px; padding:1rem; min-height:80px;
+        }
+        .odReceiptBox img {
+            max-width:100%; max-height:300px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.08);
+        }
+
         @media (max-width: 768px) {
             .app { grid-template-columns: 1fr; }
             .sidebar { position: fixed; inset: 0; height: 100vh; width: 280px; z-index: 999; display: none; }
@@ -1411,9 +1450,9 @@
                     background: rgba(0,0,0,0.45); align-items:center; justify-content:center; padding: 1rem;
                 `;
                 modal.innerHTML = `
-                    <div class="card" style="width:100%; max-width:560px; max-height:90vh; overflow:auto; padding:1.25rem;">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
-                            <h3 style="margin:0;">Order Details</h3>
+                    <div class="card" style="width:100%; max-width:480px; max-height:90vh; overflow:auto; padding:1.5rem;">
+                        <div class="odModalHeader">
+                            <h3>Order Details</h3>
                             <button type="button" class="btn secondary" id="orderDetailsCloseBtn" style="padding:0.35rem 0.75rem;">Close</button>
                         </div>
                         <div id="orderDetailsBody"></div>
@@ -1441,21 +1480,62 @@
                 const total = Number(order.total ?? order.total_amount ?? 0);
                 const receiptUrl = order.customerReceiptUrl ? String(order.customerReceiptUrl) : '';
 
+                const orderStatusClass = String(order.orderStatus || 'Pending').toLowerCase();
+
                 body.innerHTML = `
-                    <div style="display:grid; gap:0.6rem;">
-                        <div><strong>Order ID:</strong> #${order.id}</div>
-                        <div><strong>Customer:</strong> ${escapeHtml(order.customerName || '')}</div>
-                        <div><strong>Phone:</strong> ${escapeHtml(order.phone || '')}</div>
-                        <div><strong>Address:</strong> ${escapeHtml(order.address || '') || '<span class="hint">Not provided</span>'}</div>
-                        <div><strong>Products:</strong> ${items.map((it) => `${escapeHtml(it.productName || '')} x${it.quantity || 0}`).join(', ') || '-'}</div>
-                        <div><strong>Total:</strong> ₱${total.toFixed(2)}</div>
-                        <div><strong>Payment Method:</strong> ${escapeHtml(order.paymentMethod || '')}</div>
-                        <div><strong>Payment Status:</strong> ${escapeHtml(order.paymentStatus || '')}</div>
-                        <div><strong>Order Status:</strong> ${escapeHtml(order.orderStatus || '')}</div>
-                        <div>
-                            <strong>Receipt:</strong><br>
+                    <div class="odSection">
+                        <div class="odSectionTitle">Order #${order.id}</div>
+                        <div class="odGrid">
+                            <div class="odField">
+                                <div class="odLabel">Status</div>
+                                <span class="status ${orderStatusClass}">${escapeHtml(order.orderStatus || 'Pending')}</span>
+                            </div>
+                            <div class="odField">
+                                <div class="odLabel">Payment</div>
+                                <div class="odValue">${escapeHtml(order.paymentMethod || '')} &middot; ${escapeHtml(order.paymentStatus || '')}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="odSection">
+                        <div class="odSectionTitle">Buyer Information</div>
+                        <div class="odGrid">
+                            <div class="odField">
+                                <div class="odLabel">Customer</div>
+                                <div class="odValue">${escapeHtml(order.customerName || '')}</div>
+                            </div>
+                            <div class="odField">
+                                <div class="odLabel">Phone</div>
+                                <div class="odValue">${escapeHtml(order.phone || '') || '&mdash;'}</div>
+                            </div>
+                            <div class="odField odFull">
+                                <div class="odLabel">Address</div>
+                                <div class="odValue">${escapeHtml(order.address || '') || '<span class="hint">Not provided</span>'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="odSection">
+                        <div class="odSectionTitle">Products</div>
+                        <div class="odProductsList">
+                            ${items.map((it) => `
+                                <div class="odProductRow">
+                                    <span>${escapeHtml(it.productName || '')}</span>
+                                    <span>x${it.quantity || 0}</span>
+                                </div>
+                            `).join('') || '<div class="hint">No products</div>'}
+                        </div>
+                        <div class="odTotalRow">
+                            <span class="odLabel">Total</span>
+                            <span class="odValue">₱${total.toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <div class="odSection">
+                        <div class="odSectionTitle">Receipt</div>
+                        <div class="odReceiptBox">
                             ${receiptUrl
-                                ? `<a href="${escapeHtml(receiptUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(receiptUrl)}" alt="Receipt" style="max-width:100%; max-height:320px; border-radius:8px; border:1px solid #eee; margin-top:6px;" /></a>`
+                                ? `<a href="${escapeHtml(receiptUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(receiptUrl)}" alt="Receipt" /></a>`
                                 : '<span class="hint">No receipt uploaded</span>'}
                         </div>
                     </div>
