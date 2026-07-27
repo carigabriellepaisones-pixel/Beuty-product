@@ -1018,11 +1018,6 @@
             white-space: nowrap;
         }
 
-        #section-orders table.orders-dashboard-table th.ordersColReceipt,
-        #section-orders table.orders-dashboard-table td.ordersColReceipt {
-            width: 70px;
-        }
-
         #section-orders table.orders-dashboard-table th.ordersColStatus,
         #section-orders table.orders-dashboard-table td.ordersColStatus {
             width: 150px;
@@ -1122,7 +1117,6 @@
                                     <th class="ordersColQty">Qty</th>
                                     <th class="ordersColTotal">Total</th>
                                     <th class="ordersColPayment">Payment</th>
-                                    <th class="ordersColReceipt">Receipt</th>
                                     <th class="ordersColStatus">Status</th>
                                     <th class="ordersColActions">Actions</th>
                                 </tr>
@@ -1358,7 +1352,7 @@
                 const orders = getOrders();
 
                 if (!orders.length) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="hint" style="text-align:center; padding: 1.5rem;">No orders yet.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="hint" style="text-align:center; padding: 1.5rem;">No orders yet.</td></tr>';
                     return;
                 }
 
@@ -1371,10 +1365,6 @@
                     const total = Number(o.total ?? o.total_amount ?? 0);
                     const currentStatus = String(o.orderStatus || 'Pending');
                     const statusClass = currentStatus.toLowerCase();
-                    const receiptUrl = o.customerReceiptUrl ? String(o.customerReceiptUrl) : '';
-                    const receiptCell = receiptUrl
-                        ? `<a href="${escapeHtml(receiptUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(receiptUrl)}" alt="Receipt" style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid #eee;" /></a>`
-                        : '<span class="hint">—</span>';
 
                     return `
                         <tr>
@@ -1384,7 +1374,6 @@
                             <td class="ordersColQty">${qty}</td>
                             <td class="ordersColTotal">₱${total.toFixed(2)}</td>
                             <td class="ordersColPayment">${escapeHtml(o.paymentMethod || '')}<br><span class="hint">${escapeHtml(o.paymentStatus || '')}</span></td>
-                            <td class="ordersColReceipt">${receiptCell}</td>
                             <td class="ordersColStatus">
                                 <select class="orderStatusSelect ${statusClass}" data-order-id="${o.id}">
                                     ${statusOptions.map((s) => `<option value="${s}" ${s.toLowerCase() === statusClass ? 'selected' : ''}>${s}</option>`).join('')}
